@@ -1,5 +1,4 @@
 package com.boot.controller;
 
 public class testController {
- ㅇㅂㅇㅇㅂㅇㅂㅇㅂ
 }
