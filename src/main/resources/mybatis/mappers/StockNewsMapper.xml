@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.dao.StockNewsDAO">
+
+    <!-- 종목별 뉴스 리스트 -->
+    <select id="getNewsByStock" parameterType="string" resultType="com.boot.dto.StockNewsDTO">
+        SELECT *
+        FROM STOCK_NEWS
+        WHERE STOCK_CODE = #{stockCode}
+        ORDER BY NEWS_DATE DESC
+    </select>
+
+    <!-- 감성 요약 -->
+    <select id="getSentimentSummary" parameterType="string" resultType="map">
+        SELECT
+            SUM(CASE WHEN SENTIMENT = '긍정' THEN 1 ELSE 0 END) AS positive,
+            SUM(CASE WHEN SENTIMENT = '부정' THEN 1 ELSE 0 END) AS negative,
+            SUM(CASE WHEN SENTIMENT = '보통' THEN 1 ELSE 0 END) AS neutral
+        FROM STOCK_NEWS
+        WHERE STOCK_CODE = #{stockCode}
+    </select>
+
+</mapper>

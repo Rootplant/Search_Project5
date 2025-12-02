@@ -7,5 +7,7 @@
 		<package name="com.boot.dto"/>
 	</typeAliases>
 	<mappers>
+		<mapper resource="mybatis/mappers/StockInfoMapper.xml"/>
+		<mapper resource="mybatis/mappers/StockNewsMapper.xml"/>
 	</mappers>
 </configuration>

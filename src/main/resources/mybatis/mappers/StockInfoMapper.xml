@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.dao.StockInfoDAO">
+	<!-- 종목 자동완성 검색 -->
+    <select id="searchStocks" parameterType="string" resultType="com.boot.dto.StockInfoDTO">
+        SELECT *
+        FROM STOCK_INFO
+        WHERE STOCK_NAME LIKE '%' || #{keyword} || '%'
+        ORDER BY STOCK_NAME
+    </select>
+
+    <!-- 상세 정보 -->
+    <select id="getStockDetail" parameterType="string" resultType="com.boot.dto.StockInfoDTO">
+        SELECT *
+        FROM STOCK_INFO
+        WHERE STOCK_CODE = #{stockCode}
+    </select>
+</mapper>
