@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.dao.UserDAO">
+
+    <!-- ★ USER_INFO 테이블 전체 컬럼 DTO 매핑 -->
+    <resultMap id="userMap" type="com.boot.dto.UserInfoDTO">
+
+        <result property="email" column="EMAIL"/>
+        <result property="firstName" column="FIRST_NAME"/>
+        <result property="lastName" column="LAST_NAME"/>
+        <result property="fullName" column="FULL_NAME"/>
+
+        <result property="password" column="PASSWORD"/>
+        <result property="provider" column="PROVIDER"/>
+        <result property="role" column="ROLE"/>
+
+        <!-- Oracle DATE → yyyy-MM-dd HH24:mi:ss 문자열 변환 -->
+        <result property="createdAt" column="CREATED_AT"/>
+        <result property="loginFailCount" column="LOGIN_FAIL_COUNT"/>
+
+        <result property="lockUntil" column="LOCK_UNTIL"/>
+        <result property="resetToken" column="RESET_TOKEN"/>
+        <result property="tokenExpireAt" column="TOKEN_EXPIRE_AT"/>
+
+        <result property="accountStatus" column="ACCOUNT_STATUS"/>
+        <result property="suspendUntil" column="SUSPEND_UNTIL"/>
+
+    </resultMap>
+
+    <!-- 1) findByEmail - 로그인 시 사용하는 유저 조회 -->
+    <select id="findByEmail" parameterType="string" resultMap="userMap">
+        SELECT
+            EMAIL,
+            FIRST_NAME,
+            LAST_NAME,
+            FULL_NAME,
+            PASSWORD,
+            PROVIDER,
+            ROLE,
+
+            -- DATE → 문자열로 변환
+            TO_CHAR(CREATED_AT, 'YYYY-MM-DD HH24:MI:SS') AS CREATED_AT,
+            LOGIN_FAIL_COUNT,
+            TO_CHAR(LOCK_UNTIL, 'YYYY-MM-DD HH24:MI:SS') AS LOCK_UNTIL,
+            RESET_TOKEN,
+            TO_CHAR(TOKEN_EXPIRE_AT, 'YYYY-MM-DD HH24:MI:SS') AS TOKEN_EXPIRE_AT,
+            ACCOUNT_STATUS,
+            TO_CHAR(SUSPEND_UNTIL, 'YYYY-MM-DD HH24:MI:SS') AS SUSPEND_UNTIL
+
+        FROM USER_INFO
+        WHERE EMAIL = #{email}
+    </select>
+
+    <!-- 2) updateFailCount - 로그인 실패 횟수 증가 -->
+    <update id="updateFailCount">
+        UPDATE USER_INFO
+        SET LOGIN_FAIL_COUNT = #{count}
+        WHERE EMAIL = #{email}
+    </update>
+
+    <!-- 3) lockUser - 계정 잠금 설정 -->
+    <update id="lockUser">
+        UPDATE USER_INFO
+        SET 
+            LOCK_UNTIL = TO_DATE(#{lockUntil}, 'YYYY-MM-DD HH24:MI:SS'),
+            LOGIN_FAIL_COUNT = 5
+        WHERE EMAIL = #{email}
+    </update>
+
+    <!-- 4) resetFailCount - 로그인 성공 시 초기화 -->
+    <update id="resetFailCount">
+        UPDATE USER_INFO
+        SET
+            LOGIN_FAIL_COUNT = 0,
+            LOCK_UNTIL = NULL
+        WHERE EMAIL = #{email}
+    </update>
+	
+	<!-- 회원 정보 추가-->
+	<insert id="insertUser">
+	    INSERT INTO USER_INFO (
+	        EMAIL,
+	        FIRST_NAME,
+	        LAST_NAME,
+	        FULL_NAME,
+	        PASSWORD,
+	        PROVIDER,
+	        ROLE,
+	        CREATED_AT,
+	        RESET_TOKEN,
+	        TOKEN_EXPIRE_AT,
+	        ACCOUNT_STATUS
+	    ) VALUES (
+	        #{email},
+	        #{firstName},
+	        #{lastName},
+	        #{fullName},
+	        #{password},
+	        #{provider},
+	        #{role},
+	        SYSDATE,
+	        #{resetToken},
+	        TO_DATE(#{tokenExpireAt}, 'YYYY-MM-DD HH24:MI:SS'),
+	        'ACTIVE'
+	    )
+	</insert>
+</mapper>

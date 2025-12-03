@@ -15,9 +15,9 @@
     <!-- 감성 요약 -->
     <select id="getSentimentSummary" parameterType="string" resultType="map">
         SELECT
-            SUM(CASE WHEN SENTIMENT = '긍정' THEN 1 ELSE 0 END) AS positive,
-            SUM(CASE WHEN SENTIMENT = '부정' THEN 1 ELSE 0 END) AS negative,
-            SUM(CASE WHEN SENTIMENT = '보통' THEN 1 ELSE 0 END) AS neutral
+            SUM(CASE WHEN SENTIMENT = '긍정' THEN 1 ELSE 0 END) AS positiveCount,
+            SUM(CASE WHEN SENTIMENT = '부정' THEN 1 ELSE 0 END) AS negativeCount,
+            SUM(CASE WHEN SENTIMENT = '보통' THEN 1 ELSE 0 END) AS neutralCount
         FROM STOCK_NEWS
         WHERE STOCK_CODE = #{stockCode}
     </select>

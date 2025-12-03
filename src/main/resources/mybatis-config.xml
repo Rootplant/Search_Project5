@@ -9,5 +9,6 @@
 	<mappers>
 		<mapper resource="mybatis/mappers/StockInfoMapper.xml"/>
 		<mapper resource="mybatis/mappers/StockNewsMapper.xml"/>
+		<mapper resource="mybatis/mappers/UserMapper.xml"/>
 	</mappers>
 </configuration>

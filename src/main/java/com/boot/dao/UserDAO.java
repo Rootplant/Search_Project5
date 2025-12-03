@@ -1,0 +1,33 @@
+package com.boot.dao;
+
+import com.boot.dto.UserInfoDTO;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+@Mapper
+public interface UserDAO {
+
+    UserInfoDTO findByEmail(@Param("email") String email);
+
+    int updateFailCount(@Param("email") String email,
+                        @Param("count") int count);
+
+    int lockUser(@Param("email") String email,
+                 @Param("lockUntil") String lockUntil);
+
+    int resetFailCount(@Param("email") String email);
+   
+    //회원가입
+    int insertUser(
+            @Param("email") String email,
+            @Param("firstName") String firstName,
+            @Param("lastName") String lastName,
+            @Param("fullName") String fullName,
+            @Param("password") String password,
+            @Param("provider") String provider,
+            @Param("role") String role,
+            @Param("resetToken") String resetToken,
+            @Param("tokenExpireAt") String tokenExpireAt
+    );
+
+}
