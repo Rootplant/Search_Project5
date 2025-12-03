@@ -22,4 +22,9 @@ public class StockServiceImpl implements StockService {
     public void insertStockNews(StockNewsDTO dto) {
         mapper.insertStockNews(dto);
     }
+
+    @Override
+    public List<StockInfoDTO> selectTop100MarketCap() {
+        return stockDAO.selectTop100MarketCap();
+    }
 }
