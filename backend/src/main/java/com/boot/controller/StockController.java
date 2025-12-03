@@ -64,4 +64,13 @@ public class StockController {
     	stockService.insertStockNews(dto);
         return "OK";
     }
+    // 시가총액 순위 조회 엔드포인트 추가
+    @GetMapping("/marketcap") // 최종 경로: /api/stocks/marketcap
+    public ResponseEntity<List<StockInfoDTO>> getMarketCapRanking() {
+        
+        // StockService의 메서드를 호출
+        List<StockInfoDTO> ranking = stockService.selectTop100MarketCap(); 
+        
+        return ResponseEntity.ok(ranking);
+    }
 }
