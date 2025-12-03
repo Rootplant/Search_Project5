@@ -8,6 +8,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 
 @Configuration
 @EnableWebSecurity
@@ -34,4 +35,19 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+    @Bean
+        public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    
+            http
+                .csrf().disable()    // Python에서 오는 POST를 막지 않기
+                .authorizeRequests()
+                    .antMatchers("/api/**").permitAll()   // 🔥 크롤러용 API 전부 허용
+                    .anyRequest().permitAll()             // 다른 요청도 허용(지금은 보안 필요 없음)
+                .and()
+                .formLogin().disable()
+                .httpBasic().disable();
+    
+            return http.build();
+        }
+    
 }
