@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
-테스트
+
     // 로그인 요청 처리
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDTO req) {
