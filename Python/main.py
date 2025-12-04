@@ -8,7 +8,7 @@ def main():
     # ============================================
     DB_USER = "opendata_user"
     DB_PASSWORD = "opendata123"
-    DB_DSN = "localhost:1521/XE"
+    DB_DSN = "192.168.10.34:1521/XE"
     
     # DB 연결
     db = DBConnector(DB_USER, DB_PASSWORD, DB_DSN)
@@ -80,4 +80,5 @@ def main():
         db.close()
 
 if __name__ == "__main__":
+
     main()
