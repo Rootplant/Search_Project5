@@ -125,7 +125,6 @@ function StockDetailPage() {
                 </NewsItem>
             ))
         ) : (
-          // 주석
             <p>관련 뉴스가 없습니다.</p>
         )}
       </Section>

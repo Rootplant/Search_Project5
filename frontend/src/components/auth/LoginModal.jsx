@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-// 스타일 객체 정의 (styled-components 대체)
+// 스타일 객체 (라이브러리 의존성 없음)
 const styles = {
   overlay: {
     position: 'fixed',
@@ -41,7 +41,7 @@ const styles = {
     marginBottom: '15px',
     border: '1px solid #ddd',
     borderRadius: '4px',
-    boxSizing: 'border-box', // padding 포함 크기 계산
+    boxSizing: 'border-box',
   },
   button: {
     width: '100%',
@@ -84,39 +84,45 @@ function LoginModal({ onClose }) {
     }
 
     try {
+      // 1. 로그인 요청
       const response = await axios.post('/auth/login', {
         email: formData.email,
         password: formData.password
       });
 
       if (response.status === 200) {
-        console.log("로그인 성공:", response.data);
+        console.log("로그인 성공 응답:", response.data);
         
-        // 1. 토큰 저장
-        const token = response.data.token || response.data; 
-        localStorage.setItem('token', token);
+        // 2. 토큰 및 유저 정보 추출
+        // 백엔드 응답 구조: { accessToken: "...", refreshToken: "...", user: {...} }
+        // (만약 구조가 다르면 콘솔 로그 보고 변수명 맞춰주세요)
+        const { accessToken, refreshToken, token } = response.data;
+        const user = response.data.user || response.data.userInfo;
 
-        // 2. 유저 정보 저장 (헤더 표시용)
-        const fakeUser = {
-            email: formData.email,
-            fullName: '회원' 
-        };
-        localStorage.setItem('user', JSON.stringify(fakeUser));
+        // 3. 토큰 저장 (Access + Refresh)
+        // (만약 accessToken 필드가 없으면 token 필드 사용 - 예전 코드 호환)
+        localStorage.setItem('accessToken', accessToken || token);
+        if (refreshToken) {
+            localStorage.setItem('refreshToken', refreshToken);
+        }
+
+        // 4. 유저 정보 저장 (없으면 임시 생성)
+        const userInfo = user || { email: formData.email, fullName: '회원' };
+        localStorage.setItem('user', JSON.stringify(userInfo));
 
         alert("로그인 성공!");
         onClose();
-        window.location.reload(); 
+        window.location.reload(); // 헤더 갱신을 위해 새로고침
       }
 
     } catch (error) {
       console.error("로그인 실패:", error);
 
-      // 에러 처리 로직
       if (error.response) {
         const status = error.response.status;
         const msg = error.response.data;
 
-        // 1. 이메일 미인증 (403)
+        // [403 에러] 이메일 미인증 상태
         if (status === 403 && typeof msg === 'string' && msg.includes('이메일 인증')) {
             if (window.confirm(`${msg}\n\n지금 인증 코드를 입력하시겠습니까?`)) {
                 onClose();
@@ -125,14 +131,14 @@ function LoginModal({ onClose }) {
             return;
         }
 
-        // 2. 비밀번호 틀림 (401)
+        // [401 에러] 비밀번호 틀림
         if (status === 401) {
             alert("아이디 또는 비밀번호가 일치하지 않습니다.");
             return;
         }
         
-        // 3. 그 외 에러
-        alert(msg);
+        // 그 외 에러 메시지 출력
+        alert(typeof msg === 'string' ? msg : "로그인에 실패했습니다.");
       } else {
         alert("서버와 연결할 수 없습니다.");
       }

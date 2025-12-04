@@ -18,6 +18,7 @@ import { AuthProvider } from './context/AuthContext';
 import LoginPage from './pages/Login';
 import Signup from './pages/Signup';
 import FindPw from './pages/find_pw';
+import VerifyPage from './pages/VerifyPage';
 
 
 function App() {
@@ -39,6 +40,7 @@ function App() {
             <Route path="signup" element={<Signup />} />
             <Route path="findpw" element={<FindPw />} />
             <Route path="search" element={<SearchResultPage />} />
+            <Route path="verify" element={<VerifyPage />} />
           </Route>
         </Routes>
       </AuthProvider>

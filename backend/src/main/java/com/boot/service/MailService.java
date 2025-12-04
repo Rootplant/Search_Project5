@@ -14,7 +14,10 @@ public class MailService {
 
     public void sendVerificationMail(String to, String token) {
 
-        String link = "https://frontend.com/verify?token=" + token;
+//        String link = "https://frontend.com/verify?token=" + token;
+//    	먼저 프론트로 보내고 거기서 백엔드로 인증 요청 보내기
+        String link = "http://localhost:5173/verify?token=" + token;
+    	
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);

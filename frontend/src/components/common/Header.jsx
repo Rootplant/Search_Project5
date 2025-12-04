@@ -108,7 +108,9 @@ function Header() {
   // 로그아웃 기능
   const handleLogout = () => {
     localStorage.removeItem('user');
-    localStorage.removeItem('token');
+    // 토큰 2개 모두 삭제
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
     setUser(null);
     alert('로그아웃 되었습니다.');
     navigate('/');
@@ -117,7 +119,6 @@ function Header() {
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
-  // ⭐ [여기가 수정되었습니다]
   const handleSearch = () => {
     if (keyword.trim()) {
       // 리액트 검색 페이지로 이동

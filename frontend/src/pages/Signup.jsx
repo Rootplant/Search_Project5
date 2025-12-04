@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-// ... (스타일 컴포넌트들은 기존 그대로 유지하세요) ...
+// --- 스타일 컴포넌트 ---
 const Container = styled.div`
   display: flex;
   justify-content: center;
@@ -50,6 +50,7 @@ const Input = styled.input`
   border-radius: 4px;
   font-size: 14px;
   outline: none;
+  box-sizing: border-box; 
   &:focus { border-color: var(--primary-blue, #007bff); }
 `;
 
@@ -96,12 +97,13 @@ function Signup() {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
 
+    // 이메일을 수정하면 중복 확인을 다시 해야 함
     if (name === 'email') {
       setIsEmailChecked(false);
     }
   };
 
-  // 🔎 이메일 중복 확인 (수정됨)
+  // 🔎 이메일 중복 확인
   const handleCheckEmail = async () => {
     if (!formData.email) {
       alert("이메일을 입력해주세요.");
@@ -109,18 +111,16 @@ function Signup() {
     }
     
     try {
-      // ⭐ [핵심 수정 1] JSON이 아니라 '파라미터(?email=...)' 형식으로 보냄
-      // 백엔드 Controller가 @RequestParam을 쓰기 때문입니다.
+      // 파라미터 방식 전송 (?email=...)
       const response = await axios.post('/auth/check-email', null, {
         params: { email: formData.email }
       });
 
-      // ⭐ [핵심 수정 2] 백엔드가 true/false를 보내주므로 그걸 확인
       if (response.data === true) {
-        alert("✅ 사용 가능한 이메일입니다.");
+        // alert("✅ 사용 가능한 이메일입니다.");
         setIsEmailChecked(true); 
       } else {
-        alert("❌ 이미 사용 중인 이메일입니다.");
+        // alert("❌ 이미 사용 중인 이메일입니다.");
         setIsEmailChecked(false);
       }
 
@@ -131,7 +131,7 @@ function Signup() {
     }
   };
 
-  // 회원가입 요청 (수정됨)
+  // 회원가입 요청
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -145,8 +145,7 @@ function Signup() {
       return;
     }
 
-    // ⭐ [핵심 수정 3] 한국 이름 쪼개기 (백엔드가 firstName, lastName을 원함)
-    // 예: "홍길동" -> lastName="홍", firstName="길동"
+    // 이름 쪼개기 (홍길동 -> 성:홍, 이름:길동)
     const name = formData.name.trim();
     const lastName = name.substring(0, 1);
     const firstName = name.substring(1);
@@ -155,14 +154,15 @@ function Signup() {
       await axios.post('/auth/register', {
         email: formData.email,
         password: formData.password,
-        firstName: firstName, // 쪼갠 이름 전송
-        lastName: lastName,   // 쪼갠 성 전송
-        // fullName은 백엔드에서 합쳐서 만든다고 되어있으므로 안 보내도 됨 (보내도 무시될 듯)
+        firstName: firstName,
+        lastName: lastName,
         provider: 'LOCAL'
       });
       
-      alert('가입 성공! 이메일로 전송된 인증 코드를 확인해주세요.');
-      navigate(`/verify-email?email=${formData.email}`); 
+      // ⭐ [수정됨] 성공 시 알림 후 메인 페이지로 이동
+      alert('회원가입이 완료되었습니다!\n가입하신 이메일로 인증 링크가 발송되었습니다.\n메일함에서 인증을 완료한 후 로그인해주세요.');
+      
+      navigate('/'); // 메인으로 이동
 
     } catch (error) {
       console.error('가입 에러:', error);
