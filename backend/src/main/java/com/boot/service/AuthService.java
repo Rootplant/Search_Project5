@@ -83,8 +83,12 @@ public class AuthService {
         // 5) 로그인 성공 → 실패횟수 초기화
         userDAO.resetFailCount(user.getEmail());
 
-        // 6) JWT 발급
-        String token = jwtProvider.createToken(user.getEmail());
+        // 6) Access + Refresh 발급
+        String accessToken = jwtProvider.createAccessToken(user.getEmail());
+        String refreshToken = jwtProvider.createRefreshToken(user.getEmail());
+
+        
+        userDAO.updateRefreshToken(user.getEmail(), refreshToken);
 
         // 7) 프론트에 내려줄 사용자 정보 구성 (민감정보 제외)
         LoginUserInfoDTO userInfo = new LoginUserInfoDTO(
@@ -96,7 +100,7 @@ public class AuthService {
                 user.getAccountStatus()
         );
 
-        LoginResponseDTO response = new LoginResponseDTO(token, userInfo);
+        LoginResponseDTO response = new LoginResponseDTO(accessToken, refreshToken, userInfo);
 
         return ResponseEntity.ok(response);
     }
@@ -240,5 +244,64 @@ public class AuthService {
         userDAO.updatePasswordAndClearToken(user.getEmail(), encodedPw);
 
         return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습니다.");
+    }
+    
+    public ResponseEntity<?> refresh(String refreshToken) {
+
+        // 1) refreshToken null 체크
+        if (refreshToken == null || refreshToken.isBlank()) {
+            return ResponseEntity.status(400).body("Refresh Token이 없습니다.");
+        }
+
+        // 2) DB에서 해당 refreshToken 가진 유저 정보 조회
+        UserInfoDTO user = userDAO.findByRefreshToken(refreshToken);
+        if (user == null) {
+            return ResponseEntity.status(401).body("유효하지 않은 Refresh Token입니다.");
+        }
+
+        // 3) 계정 상태 확인
+        if (!"ACTIVE".equals(user.getAccountStatus())) {
+            return ResponseEntity.status(403).body("계정 상태가 비정상적입니다.");
+        }
+
+        // 4) Refresh Token 자체 유효성(JWT 검증)
+        if (!jwtProvider.validateToken(refreshToken)) {
+            return ResponseEntity.status(401).body("Refresh Token이 만료되었습니다. 다시 로그인하세요.");
+        }
+
+        // 5) 새 Access Token 생성
+        String newAccessToken = jwtProvider.createAccessToken(user.getEmail());
+
+        // 6) userInfo 생성 (LoginUserInfoDTO 형태)
+        LoginUserInfoDTO userInfo = new LoginUserInfoDTO(
+                user.getEmail(),
+                user.getFullName(),
+                user.getRole(),
+                user.getProvider(),
+                user.getCreatedAt(),
+                user.getAccountStatus()
+        );
+
+        // 7) LoginResponseDTO 생성 (access + refresh + user)
+        LoginResponseDTO response = new LoginResponseDTO(
+                newAccessToken,      // 새로운 accessToken
+                refreshToken,        // refreshToken 그대로 반환
+                userInfo             // 사용자 정보
+        );
+
+        return ResponseEntity.ok(response);
+    }
+    public ResponseEntity<?> logout(String email) {
+
+        UserInfoDTO user = userDAO.findByEmail(email);
+
+        if (user == null) {
+            return ResponseEntity.status(404).body("해당 이메일의 계정을 찾을 수 없습니다.");
+        }
+
+        // DB에서 refresh token 삭제
+        userDAO.deleteRefreshToken(email);
+
+        return ResponseEntity.ok("로그아웃되었습니다.");
     }
 }

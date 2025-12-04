@@ -25,7 +25,7 @@
 
         <result property="accountStatus" column="ACCOUNT_STATUS"/>
         <result property="suspendUntil" column="SUSPEND_UNTIL"/>
-
+		<result property="refreshToken" column="REFRESH_TOKEN"/>
     </resultMap>
 
     <!-- 1) findByEmail - 로그인 시 사용하는 유저 조회 -->
@@ -46,7 +46,8 @@
             RESET_TOKEN,
             TO_CHAR(TOKEN_EXPIRE_AT, 'YYYY-MM-DD HH24:MI:SS') AS TOKEN_EXPIRE_AT,
             ACCOUNT_STATUS,
-            TO_CHAR(SUSPEND_UNTIL, 'YYYY-MM-DD HH24:MI:SS') AS SUSPEND_UNTIL
+            TO_CHAR(SUSPEND_UNTIL, 'YYYY-MM-DD HH24:MI:SS') AS SUSPEND_UNTIL,
+            REFRESH_TOKEN
 
         FROM USER_INFO
         WHERE EMAIL = #{email}
@@ -155,5 +156,21 @@
 	        TOKEN_EXPIRE_AT = NULL
 	    WHERE EMAIL = #{email}
 	</update>
-
+	
+	<update id="updateRefreshToken">
+	    UPDATE USER_INFO
+	    SET REFRESH_TOKEN = #{refreshToken}
+	    WHERE EMAIL = #{email}
+	</update>
+	
+	<select id="findByRefreshToken" resultMap="userMap">
+	    SELECT * FROM USER_INFO
+	    WHERE REFRESH_TOKEN = #{refreshToken}
+	</select>
+	
+	<update id="deleteRefreshToken">
+	    UPDATE USER_INFO
+	    SET REFRESH_TOKEN = NULL
+	    WHERE EMAIL = #{email}
+	</update>
 </mapper>

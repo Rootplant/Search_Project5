@@ -3,9 +3,13 @@ package com.boot.controller;
 import com.boot.dto.LoginRequestDTO;
 import com.boot.dto.PasswordResetConfirmDTO;
 import com.boot.dto.PasswordResetRequestDTO;
+import com.boot.dto.RefreshRequestDTO;
 import com.boot.dto.RegisterRequestDTO;
 import com.boot.service.AuthService;
 import lombok.RequiredArgsConstructor;
+
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,5 +59,14 @@ public class AuthController {
     @PostMapping("/reset/confirm")
     public ResponseEntity<?> confirmReset(@RequestBody PasswordResetConfirmDTO req) {
         return authService.resetPassword(req);
+    }
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refresh(@RequestBody RefreshRequestDTO req) {
+        return authService.refresh(req.getRefreshToken());
+    }
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestBody Map<String, String> req) {
+        String email = req.get("email");
+        return authService.logout(email);
     }
 }

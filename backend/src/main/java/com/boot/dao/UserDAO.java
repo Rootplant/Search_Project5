@@ -46,4 +46,11 @@ public interface UserDAO {
             @Param("email") String email,
             @Param("password") String newPassword
     );
+    
+    void updateRefreshToken(
+    		@Param("email") String email,
+            @Param("refreshToken") String refreshToken);
+
+    UserInfoDTO findByRefreshToken(String refreshToken);
+    void deleteRefreshToken(String email);
 }

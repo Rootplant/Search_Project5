@@ -27,4 +27,7 @@ public class UserInfoDTO {
 
     private String accountStatus;     // ACTIVE / SUSPENDED
     private String suspendUntil;      // 정지 해제 시간
+    
+    // JWT Refresh Token (DB 저장용)
+    private String refreshToken; 
 }
