@@ -20,6 +20,8 @@ import Signup from './pages/Signup';
 import FindPw from './pages/find_pw';
 import VerifyPage from './pages/VerifyPage';
 
+import TestStockDetailPage from './pages/TestStockDetailPage';
+
 
 function App() {
   return (
@@ -41,6 +43,7 @@ function App() {
             <Route path="findpw" element={<FindPw />} />
             <Route path="search" element={<SearchResultPage />} />
             <Route path="verify" element={<VerifyPage />} />
+            <Route path="/chart/:code" element={<TestStockDetailPage />} />
           </Route>
         </Routes>
       </AuthProvider>
