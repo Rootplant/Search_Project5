@@ -7,6 +7,7 @@ import com.boot.dto.RefreshRequestDTO;
 import com.boot.dto.RegisterRequestDTO;
 import com.boot.dto.SocialUserInfoDTO;
 import com.boot.service.AuthService;
+import com.boot.service.GoogleOAuthService;
 import com.boot.service.KakaoOAuthService;
 import com.boot.service.NaverOAuthService;
 
@@ -25,6 +26,7 @@ public class AuthController {
 	private final AuthService authService;
 	private final KakaoOAuthService kakaoOAuthService;
 	private final NaverOAuthService naverOAuthService;
+	private final GoogleOAuthService googleOAuthService;
 
     // 로그인 요청 처리
     @PostMapping("/login")
@@ -93,5 +95,14 @@ public class AuthController {
 
         SocialUserInfoDTO socialUser = naverOAuthService.getUserInfo(code, state);
         return authService.socialLogin(socialUser);
+    }
+    
+    //구글 로그인
+    @GetMapping("/google/callback")
+    public ResponseEntity<?> googleCallback(@RequestParam String code) {
+
+        SocialUserInfoDTO social = googleOAuthService.getUserInfo(code);
+
+        return authService.socialLogin(social);
     }
 }
