@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 import time
 import re
+import sys
 
 # ===============================
 # 공통: 문자열 정리 (깨짐·특수문자 제거)
@@ -150,6 +151,11 @@ def main():
         send_to_api(item)
         time.sleep(0.05)
 
-
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+        sys.exit(0)  # 정상 종료
+    except Exception as e:
+        print("ERROR:", e)
+        sys.exit(1)  # 에러 종료
+
