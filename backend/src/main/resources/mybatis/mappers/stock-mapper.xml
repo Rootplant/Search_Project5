@@ -5,30 +5,58 @@
 
 <mapper namespace="com.boot.dao.StockMapper">
 
-    <!-- STOCK_INFO INSERT -->
-    <insert id="insertStockInfo" parameterType="com.boot.dto.StockInfoDTO">
-        INSERT INTO STOCK_INFO (
-            STOCK_CODE,
-            STOCK_NAME,
-            MARKET_TYPE,
-            INDUSTRY,
-            PRICE,
-            PRICE_CHANGE,
-            CHANGE_RATE,
-            MARKET_CAP,
-            UPDATED_AT
-        ) VALUES (
-            #{stockCode,   jdbcType=VARCHAR},
-            #{stockName,   jdbcType=VARCHAR},
-            #{marketType,  jdbcType=VARCHAR},
-            #{industry,    jdbcType=VARCHAR},
-            #{price,       jdbcType=INTEGER},
-            #{priceChange, jdbcType=INTEGER},
-            #{changeRate,  jdbcType=DOUBLE},
-            #{marketCap,   jdbcType=VARCHAR},
-            SYSDATE
-        )
-    </insert>
+    <!-- STOCK_INFO MERGE (INSERT + UPDATE) -->
+    <update id="insertStockInfo" parameterType="com.boot.dto.StockInfoDTO">
+        MERGE INTO STOCK_INFO T
+        USING (
+            SELECT 
+                #{stockCode,   jdbcType=VARCHAR}   AS STOCK_CODE,
+                #{stockName,   jdbcType=VARCHAR}   AS STOCK_NAME,
+                #{marketType,  jdbcType=VARCHAR}   AS MARKET_TYPE,
+                #{industry,    jdbcType=VARCHAR}   AS INDUSTRY,
+                #{price,       jdbcType=INTEGER}   AS PRICE,
+                #{priceChange, jdbcType=INTEGER}   AS PRICE_CHANGE,
+                #{changeRate,  jdbcType=DOUBLE}    AS CHANGE_RATE,
+                #{marketCap,   jdbcType=VARCHAR}   AS MARKET_CAP
+            FROM dual
+        ) S
+        ON (T.STOCK_CODE = S.STOCK_CODE)
+
+        WHEN MATCHED THEN
+            UPDATE SET
+                T.STOCK_NAME   = S.STOCK_NAME,
+                T.MARKET_TYPE  = S.MARKET_TYPE,
+                T.INDUSTRY     = S.INDUSTRY,
+                T.PRICE        = S.PRICE,
+                T.PRICE_CHANGE = S.PRICE_CHANGE,
+                T.CHANGE_RATE  = S.CHANGE_RATE,
+                T.MARKET_CAP   = S.MARKET_CAP,
+                T.UPDATED_AT   = SYSDATE
+
+        WHEN NOT MATCHED THEN
+            INSERT (
+                STOCK_CODE,
+                STOCK_NAME,
+                MARKET_TYPE,
+                INDUSTRY,
+                PRICE,
+                PRICE_CHANGE,
+                CHANGE_RATE,
+                MARKET_CAP,
+                UPDATED_AT
+            )
+            VALUES (
+                S.STOCK_CODE,
+                S.STOCK_NAME,
+                S.MARKET_TYPE,
+                S.INDUSTRY,
+                S.PRICE,
+                S.PRICE_CHANGE,
+                S.CHANGE_RATE,
+                S.MARKET_CAP,
+                SYSDATE
+            )
+    </update>
 
     <!-- STOCK_NEWS INSERT -->
     <insert id="insertStockNews" parameterType="com.boot.dto.StockNewsDTO">
