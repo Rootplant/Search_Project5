@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# 환경변수 파일 (절대 올리지 마세요!)
+.env
+.env.production
+.env.development
+.env.test

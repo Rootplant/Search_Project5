@@ -25,6 +25,8 @@ import TestStockDetailPage from './pages/TestStockDetailPage';
 import FindPasswordPage from './pages/FindPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 
+import SocialLoginCallback from './pages/SocialLoginCallback';
+
 function App() {
   return (
     <BrowserRouter>
@@ -48,6 +50,9 @@ function App() {
             <Route path="/chart/:code" element={<TestStockDetailPage />} />
             <Route path="find-pw" element={<FindPasswordPage />} />
             <Route path="reset-password" element={<ResetPasswordPage />} />
+            <Route path="oauth/callback/kakao" element={<SocialLoginCallback provider="kakao" />} />
+            <Route path="oauth/callback/naver" element={<SocialLoginCallback provider="naver" />} />
+            <Route path="oauth/callback/google" element={<SocialLoginCallback provider="google" />} />
           </Route>
         </Routes>
       </AuthProvider>
