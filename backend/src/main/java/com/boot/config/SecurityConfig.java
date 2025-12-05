@@ -28,6 +28,8 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // JWT 방식
             .and()
             .authorizeHttpRequests()
+	         	// QR 승인은 인증 필요		
+	            .antMatchers("/auth/qr/approve").authenticated()
                 .antMatchers("/auth/**").permitAll()        // 로그인/회원가입 API/소셜 콜백
                 .antMatchers("/api/stocks/**").permitAll()  // 공개 API
                 .antMatchers("/api/news/**").permitAll()    // 공개 API

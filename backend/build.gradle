@@ -46,7 +46,10 @@ dependencies {
     // Redis Integration
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	
-	
+//	QR 이미지 생성
+	implementation 'com.google.zxing:core:3.5.1'
+	implementation 'com.google.zxing:javase:3.5.1'
+
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	runtimeOnly 'com.oracle.database.jdbc:ojdbc11'
