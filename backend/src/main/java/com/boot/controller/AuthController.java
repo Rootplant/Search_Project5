@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
 
+import javax.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,7 +32,7 @@ public class AuthController {
 
     // 로그인 요청 처리
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequestDTO req) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDTO req) {
 
         // 모든 로그인 로직은 서비스로 위임
         return authService.login(req);
@@ -43,7 +45,7 @@ public class AuthController {
     
     //회원 가입
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequestDTO req) {
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequestDTO req) {
         return authService.register(req);
     }
     
@@ -65,7 +67,7 @@ public class AuthController {
     }
 
     @PostMapping("/reset/confirm")
-    public ResponseEntity<?> confirmReset(@RequestBody PasswordResetConfirmDTO req) {
+    public ResponseEntity<?> confirmReset(@Valid @RequestBody PasswordResetConfirmDTO req) {
         return authService.resetPassword(req);
     }
     @PostMapping("/refresh")
