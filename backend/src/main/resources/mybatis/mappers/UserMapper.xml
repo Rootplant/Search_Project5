@@ -164,26 +164,26 @@
 	</update>
 	
 	<!-- Refresh Token 으로 유저 조회 -->
-	<select id="findByRefreshToken" resultMap="userMap">
-	    SELECT
-	        EMAIL,
-	        FIRST_NAME,
-	        LAST_NAME,
-	        FULL_NAME,
-	        PASSWORD,
-	        PROVIDER,
-	        ROLE,
-	        TO_CHAR(CREATED_AT, 'YYYY-MM-DD HH24:MI:SS') AS CREATED_AT,
-	        LOGIN_FAIL_COUNT,
-	        TO_CHAR(LOCK_UNTIL, 'YYYY-MM-DD HH24:MI:SS') AS LOCK_UNTIL,
-	        RESET_TOKEN,
-	        TO_CHAR(TOKEN_EXPIRE_AT, 'YYYY-MM-DD HH24:MI:SS') AS TOKEN_EXPIRE_AT,
-	        ACCOUNT_STATUS,
-	        TO_CHAR(SUSPEND_UNTIL, 'YYYY-MM-DD HH24:MI:SS') AS SUSPEND_UNTIL,
-	        REFRESH_TOKEN
-	    FROM USER_INFO
-	    WHERE REFRESH_TOKEN = #{refreshToken}
-	</select>
+<!--	<select id="findByRefreshToken" resultMap="userMap">-->
+<!--	    SELECT-->
+<!--	        EMAIL,-->
+<!--	        FIRST_NAME,-->
+<!--	        LAST_NAME,-->
+<!--	        FULL_NAME,-->
+<!--	        PASSWORD,-->
+<!--	        PROVIDER,-->
+<!--	        ROLE,-->
+<!--	        TO_CHAR(CREATED_AT, 'YYYY-MM-DD HH24:MI:SS') AS CREATED_AT,-->
+<!--	        LOGIN_FAIL_COUNT,-->
+<!--	        TO_CHAR(LOCK_UNTIL, 'YYYY-MM-DD HH24:MI:SS') AS LOCK_UNTIL,-->
+<!--	        RESET_TOKEN,-->
+<!--	        TO_CHAR(TOKEN_EXPIRE_AT, 'YYYY-MM-DD HH24:MI:SS') AS TOKEN_EXPIRE_AT,-->
+<!--	        ACCOUNT_STATUS,-->
+<!--	        TO_CHAR(SUSPEND_UNTIL, 'YYYY-MM-DD HH24:MI:SS') AS SUSPEND_UNTIL,-->
+<!--	        REFRESH_TOKEN-->
+<!--	    FROM USER_INFO-->
+<!--	    WHERE REFRESH_TOKEN = #{refreshToken}-->
+<!--	</select>-->
 	
 	<update id="deleteRefreshToken">
 	    UPDATE USER_INFO

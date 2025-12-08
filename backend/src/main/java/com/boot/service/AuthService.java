@@ -258,31 +258,58 @@ public class AuthService {
     
     public ResponseEntity<?> refresh(String refreshToken) {
 
-        // 1) refreshToken null 체크
+        // 1) null / 공백 체크
         if (refreshToken == null || refreshToken.isBlank()) {
             return ResponseEntity.status(400).body("Refresh Token이 없습니다.");
         }
 
-        // 2) DB에서 해당 refreshToken 가진 유저 정보 조회
-        UserInfoDTO user = userDAO.findByRefreshToken(refreshToken);
-        if (user == null) {
-            return ResponseEntity.status(401).body("유효하지 않은 Refresh Token입니다.");
-        }
-
-        // 3) 계정 상태 확인
-        if (!"ACTIVE".equals(user.getAccountStatus())) {
-            return ResponseEntity.status(403).body("계정 상태가 비정상적입니다.");
-        }
-
-        // 4) Refresh Token 자체 유효성(JWT 검증)
+        // 2) JWT 자체 검증 (서명, 만료시간 등)
         if (!jwtProvider.validateToken(refreshToken)) {
-            return ResponseEntity.status(401).body("Refresh Token이 만료되었습니다. 다시 로그인하세요.");
+            return ResponseEntity.status(401).body("Refresh Token이 만료되었거나 유효하지 않습니다. 다시 로그인해주세요.");
         }
 
-        // 5) 새 Access Token 생성
-        String newAccessToken = jwtProvider.createAccessToken(user.getEmail());
+        // 3) 토큰에서 email 꺼내기
+        String email = jwtProvider.getEmailFromToken(refreshToken);
+        if (email == null || email.isBlank()) {
+            return ResponseEntity.status(401).body("Refresh Token에서 이메일 정보를 읽을 수 없습니다.");
+        }
 
-        // 6) userInfo 생성 (LoginUserInfoDTO 형태)
+        // 4) email 기준으로 유저 조회
+        UserInfoDTO user = userDAO.findByEmail(email);
+        if (user == null) {
+            return ResponseEntity.status(401).body("해당 사용자를 찾을 수 없습니다.");
+        }
+
+        // 5) 계정 상태 확인
+        if (!"ACTIVE".equals(user.getAccountStatus())) {
+            return ResponseEntity.status(403).body("계정이 활성 상태가 아닙니다.");
+        }
+
+        // 6) DB에 저장된 Refresh Token과 비교 (로테이션 핵심)
+        String storedRefreshToken = user.getRefreshToken();
+
+        // DB에 토큰이 없거나, 전달된 토큰과 다르면 → 탈취 / 재사용 의심
+        if (storedRefreshToken == null || !storedRefreshToken.equals(refreshToken)) {
+
+            // 👉 보안상: DB의 Refresh Token 완전히 폐기
+            userDAO.deleteRefreshToken(email);
+
+            // 필요하면 로그 남기기 (여기서는 System.out 예시)
+            System.out.println("[SECURITY] Refresh Token mismatch! email=" + email);
+
+            return ResponseEntity.status(401)
+                    .body("Refresh Token이 유효하지 않습니다. 다시 로그인해주세요.");
+        }
+
+        // 7) 여기까지 통과했다면: 정상적인 Refresh 요청
+        //    → 새 Access Token + 새 Refresh Token 발급 (로테이션)
+        String newAccessToken = jwtProvider.createAccessToken(email);
+        String newRefreshToken = jwtProvider.createRefreshToken(email);
+
+        // 8) DB에 새 Refresh Token 저장 (이전 토큰은 자동으로 폐기)
+        userDAO.updateRefreshToken(email, newRefreshToken);
+
+        // 9) 프론트에 내려줄 사용자 정보
         LoginUserInfoDTO userInfo = new LoginUserInfoDTO(
                 user.getEmail(),
                 user.getFullName(),
@@ -292,15 +319,16 @@ public class AuthService {
                 user.getAccountStatus()
         );
 
-        // 7) LoginResponseDTO 생성 (access + refresh + user)
+        // 10) 응답 DTO 구성 (새 Access + 새 Refresh + 유저 정보)
         LoginResponseDTO response = new LoginResponseDTO(
-                newAccessToken,      // 새로운 accessToken
-                refreshToken,        // refreshToken 그대로 반환
-                userInfo             // 사용자 정보
+                newAccessToken,
+                newRefreshToken,
+                userInfo
         );
 
         return ResponseEntity.ok(response);
     }
+
     public ResponseEntity<?> logout(String email) {
 
         UserInfoDTO user = userDAO.findByEmail(email);
