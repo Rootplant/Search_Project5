@@ -211,6 +211,7 @@ const StockName = styled.span`
   margin-right: 5px;
 `;
 
+
 // ----------------------------------------------------
 // 🌟 유틸리티 함수
 // ----------------------------------------------------
@@ -228,6 +229,24 @@ const formatRate = (rate) => {
 
 // --- HomePage Function ---
 function HomePage() {
+
+    const [indexData, setIndexData] = useState({
+      kospi: null,
+      kosdaq: null,
+    });
+
+    // ✅ ✅ ✅ 최신 지수 불러오기
+    useEffect(() => {
+      const fetchLatestIndex = async () => {
+        const res = await axios.get('http://localhost:8484/api/chart/latest');
+        setIndexData({
+          kospi: res.data.kospi,
+          kosdaq: res.data.kosdaq,
+        });
+      };
+      fetchLatestIndex();
+    }, []);
+
     
     const [activeKeyword, setActiveKeyword] = useState('Today_Hot');
 
@@ -340,7 +359,17 @@ function HomePage() {
                 {/* Kospi 지수 (그래프 포함 영역) */}
                 <KospiIndexCard>
                     <h3>🇰🇷 KOSPI 지수</h3>
-                    <p>3,000.50 <span style={{ color: 'red' }}>(+0.50%)</span></p>
+                    <p>
+                      {indexData.kospi
+                        ? indexData.kospi.clpr.toLocaleString()
+                        : '로딩 중...'}{' '}
+                      {indexData.kospi && (
+                        <span style={{ color: indexData.kospi.fltRt > 0 ? 'red' : 'blue' }}>
+                          ({indexData.kospi.fltRt > 0 ? '+' : ''}
+                          {indexData.kospi.fltRt.toFixed(2)}%)
+                        </span>
+                      )}
+                    </p>
                     
                     {/* ⭐ Kospi Line Chart 컴포넌트 삽입 */}
                     <div style={{ 
@@ -363,7 +392,17 @@ function HomePage() {
                 {/* Kosdaq 지수 (그래프 포함 영역) - Kospi와 동일 스타일 적용 */}
                 <KospiIndexCard>
                     <h3>🌐 KOSDAQ 지수</h3>
-                    <p>950.75 <span style={{ color: 'blue' }}>(-0.25%)</span></p>
+                    <p>
+                      {indexData.kosdaq
+                        ? indexData.kosdaq.clpr.toLocaleString()
+                        : '로딩 중...'}{' '}
+                      {indexData.kosdaq && (
+                        <span style={{ color: indexData.kosdaq.fltRt > 0 ? 'red' : 'blue' }}>
+                          ({indexData.kosdaq.fltRt > 0 ? '+' : ''}
+                          {indexData.kosdaq.fltRt.toFixed(2)}%)
+                        </span>
+                      )}
+                    </p>
                     
                     {/* ⭐ Kosdaq Line Chart 컴포넌트 삽입 */}
                     <div style={{ 

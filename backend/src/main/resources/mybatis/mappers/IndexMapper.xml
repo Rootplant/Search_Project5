@@ -138,5 +138,26 @@
         FROM STOCK_INDEX_DATA_KOSDAQ
         WHERE IDX_NM = #{idxNm}
     </select>
+    
+    <select id="selectLatestKospi" resultType="com.boot.dto.IndexDataDTO">
+	    SELECT *
+	    FROM (
+	        SELECT *
+	        FROM STOCK_INDEX_DATA
+	        ORDER BY BASE_DT DESC
+	    )
+	    WHERE ROWNUM = 1
+	</select>
+	
+	<select id="selectLatestKosdaq" resultType="com.boot.dto.IndexDataDTO">
+	    SELECT *
+	    FROM (
+	        SELECT *
+	        FROM STOCK_INDEX_DATA_KOSDAQ
+	        ORDER BY BASE_DT DESC
+	    )
+	    WHERE ROWNUM = 1
+	</select>
+
 
 </mapper>

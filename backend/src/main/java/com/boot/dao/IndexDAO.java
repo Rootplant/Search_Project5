@@ -27,5 +27,9 @@ public interface IndexDAO {
 	
 	 // KOSDAQ 테이블의 가장 최근 날짜를 'yyyyMMdd' 문자열로 조회
 	 String selectLatestKosdaqBasDt(String idxNm);
+	 
+	 IndexDataDTO selectLatestKospi();
+	 IndexDataDTO selectLatestKosdaq();
+
 
 }

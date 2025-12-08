@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/chart")
@@ -14,15 +15,24 @@ import java.util.List;
 public class IndexController {
 
     @Autowired
-    private IndexReadService indexService;
+    private IndexReadService IndexReadService;
+    
+    @Autowired
+    private IndexService indexService;
 
     @GetMapping("/kospi-history")
     public ResponseEntity<List<IndexDataDTO>> getKospiHistory() {
-        return ResponseEntity.ok(indexService.getKospiTimeSeriesData());
+        return ResponseEntity.ok(IndexReadService.getKospiTimeSeriesData());
     }
 
     @GetMapping("/kosdaq-history")
     public ResponseEntity<List<IndexDataDTO>> getKosdaqHistory() {
-        return ResponseEntity.ok(indexService.getKosdaqTimeSeriesData());
+        return ResponseEntity.ok(IndexReadService.getKosdaqTimeSeriesData());
+    }
+    
+
+    @GetMapping("/latest")
+    public Map<String, Object> getLatestIndex() {
+        return indexService.getLatestIndexData();
     }
 }

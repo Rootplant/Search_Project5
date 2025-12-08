@@ -13,7 +13,10 @@ import java.io.ByteArrayInputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.cache.annotation.Cacheable;
@@ -313,4 +316,16 @@ public class IndexService {
     public void saveSingleKosdaqDayData(String targetDate) {
         collectDataRangeAndSave(TARGET_INDEX_KOSDAQ, 1, targetDate, targetDate);
     }
+    public Map<String, Object> getLatestIndexData() {
+        Map<String, Object> result = new HashMap<>();
+
+        IndexDataDTO kospi = indexDAO.selectLatestKospi();
+        IndexDataDTO kosdaq = indexDAO.selectLatestKosdaq();
+
+        result.put("kospi", kospi);
+        result.put("kosdaq", kosdaq);
+
+        return result;
+    }
+
 }
