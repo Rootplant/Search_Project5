@@ -2,6 +2,7 @@ package com.boot.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -67,6 +68,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 	
                 	// 토큰에서 email 꺼내기
                     String email = jwtProvider.getEmailFromToken(token);
+                    //role 추가 추출 
+                    String role = jwtProvider.getRoleFromToken(token);
 
                     // 이미 인증된 경우 재인증 방지
                     if (email != null &&
@@ -75,11 +78,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     	// DB에서 유저정보 로드
                         UserDetails userDetails =
                                 userDetailsService.loadUserByUsername(email);
-
+                        
+                        // ⭐ JWT에서 읽은 role을 Spring Security 권한으로 변환
+                        SimpleGrantedAuthority authority =
+                                new SimpleGrantedAuthority("ROLE_" + role);
+                        
                         // 스프링 시큐리티가 인증된 사용자로 인식하도록 설정
                         UsernamePasswordAuthenticationToken authentication =
                                 new UsernamePasswordAuthenticationToken(
-                                        userDetails, null, userDetails.getAuthorities()
+                                        userDetails, null, List.of(authority)
                                 );
 
                         SecurityContextHolder.getContext().setAuthentication(authentication);

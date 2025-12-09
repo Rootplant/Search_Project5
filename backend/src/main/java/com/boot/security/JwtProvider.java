@@ -18,11 +18,12 @@ public class JwtProvider {
     private final Long REFRESH_EXPIRATION = 1000L * 60 * 60 * 24 * 7;
 
     // Access Token 생성
-    public String createAccessToken(String email) {
+    public String createAccessToken(String email, String role) {
         Date now = new Date();
 
         return Jwts.builder()
                 .setSubject(email) // 토큰에 저장할 값 (여기서는 email)
+                .claim("role", role)
                 .setIssuedAt(now) // 발급 시간
                 .setExpiration(new Date(now.getTime() + ACCESS_EXPIRATION)) // 만료 시간
                 .signWith(SignatureAlgorithm.HS256, SECRET) // 암호화 방식
@@ -30,11 +31,12 @@ public class JwtProvider {
     }
 
     // Refresh Token 생성
-    public String createRefreshToken(String email) {
+    public String createRefreshToken(String email, String role) {
         Date now = new Date();
 
         return Jwts.builder()
                 .setSubject(email)
+                .claim("role", role)
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + REFRESH_EXPIRATION))
                 .signWith(SignatureAlgorithm.HS256, SECRET)
@@ -49,7 +51,15 @@ public class JwtProvider {
                 .getBody()
                 .getSubject();
     }
-
+    
+    // JWT → role 추출
+    public String getRoleFromToken(String token) {
+        return Jwts.parser()
+                .setSigningKey(SECRET)
+                .parseClaimsJws(token)
+                .getBody()
+                .get("role", String.class);
+    }
     // JWT 유효성 검사
     public boolean validateToken(String token) {
         try {

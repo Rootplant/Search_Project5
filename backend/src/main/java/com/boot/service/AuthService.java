@@ -85,8 +85,8 @@ public class AuthService {
         userDAO.resetFailCount(user.getEmail());
 
         // 6) Access + Refresh 발급
-        String accessToken = jwtProvider.createAccessToken(user.getEmail());
-        String refreshToken = jwtProvider.createRefreshToken(user.getEmail());
+        String accessToken = jwtProvider.createAccessToken(user.getEmail(), user.getRole());
+        String refreshToken = jwtProvider.createRefreshToken(user.getEmail(), user.getRole());
 
         
         userDAO.updateRefreshToken(user.getEmail(), refreshToken);
@@ -303,8 +303,8 @@ public class AuthService {
 
         // 7) 여기까지 통과했다면: 정상적인 Refresh 요청
         //    → 새 Access Token + 새 Refresh Token 발급 (로테이션)
-        String newAccessToken = jwtProvider.createAccessToken(email);
-        String newRefreshToken = jwtProvider.createRefreshToken(email);
+        String newAccessToken = jwtProvider.createAccessToken(email, user.getRole());
+        String newRefreshToken = jwtProvider.createRefreshToken(email, user.getRole());
 
         // 8) DB에 새 Refresh Token 저장 (이전 토큰은 자동으로 폐기)
         userDAO.updateRefreshToken(email, newRefreshToken);
@@ -366,8 +366,8 @@ public class AuthService {
         }
 
         // 4) JWT Access / Refresh 발급
-        String accessToken = jwtProvider.createAccessToken(user.getEmail());
-        String refreshToken = jwtProvider.createRefreshToken(user.getEmail());
+        String accessToken = jwtProvider.createAccessToken(user.getEmail(), user.getRole());
+        String refreshToken = jwtProvider.createRefreshToken(user.getEmail(), user.getRole());
 
         // 5) Refresh 토큰 DB 저장
         userDAO.updateRefreshToken(user.getEmail(), refreshToken);
