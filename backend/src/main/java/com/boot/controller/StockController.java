@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.springframework.web.bind.annotation.*;
 
+import com.boot.StockRealtimeHandler;
 import com.boot.dto.StockDetailResponseDTO;
 import com.boot.dto.StockInfoDTO;
 import com.boot.dto.StockNewsDTO;
@@ -91,5 +92,21 @@ public class StockController {
         movers.put("falling", falling);
         
         return movers;
+    }
+    
+    private final StockRealtimeHandler stockRealtimeHandler;
+
+    @PostMapping("/realtime")
+    public String receiveRealtimeData(@RequestBody Map<String, Object> payload) {
+        String stockCode = (String) payload.get("stockCode");
+        // 'data' 필드를 Object로 받거나, Map으로 명시적으로 받도록 처리
+        Object data = payload.get("data"); 
+
+        if (stockCode != null && data != null) {
+            // WebSocketHandler를 통해 클라이언트(React)로 데이터 푸시
+            stockRealtimeHandler.pushStockData(stockCode, data);
+            return "Push Success";
+        }
+        return "Invalid Payload";
     }
 }

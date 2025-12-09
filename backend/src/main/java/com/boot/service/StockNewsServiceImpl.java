@@ -228,4 +228,16 @@ public class StockNewsServiceImpl implements StockNewsService {
         if (val instanceof Number) return ((Number) val).doubleValue();
         return 0.0;
     }
+
+	@Override
+	public List<String> getIndustries() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<StockNewsDTO> getNewsByIndustry(String industry) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
