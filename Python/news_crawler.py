@@ -1,4 +1,4 @@
-# news_crawler.py - 종목명 매칭 개선 (STOCK_INFO에 있는 종목만 매칭, 100개로 변경)
+# news_crawler.py - 종목명 매칭 개선 (STOCK_INFO에 있는 종목만 매칭, 100개로 변경) + 날짜 추출 개선
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
@@ -206,21 +206,124 @@ def find_stock_code(conn, title, content):
         return None
 
 # ===============================
-# 뉴스 본문 크롤링
+# 날짜 텍스트 파싱 (개선된 함수)
 # ===============================
-def fetch_news_content(news_url):
-    """뉴스 상세 페이지에서 본문 추출"""
+def parse_news_date_from_text(date_text):
+    """다양한 형식의 날짜 텍스트를 DATE 형식으로 변환"""
+    if not date_text:
+        return None
+    
+    try:
+        # 공백 제거
+        date_text = date_text.strip()
+        
+        # "2025.12.05" 형식
+        if re.match(r'\d{4}\.\d{1,2}\.\d{1,2}', date_text):
+            date_str = date_text.replace(".", "-")
+            parts = date_str.split("-")
+            if len(parts) == 3:
+                year, month, day = parts
+                return datetime(int(year), int(month), int(day)).date()
+        
+        # "2025-12-05" 형식
+        if re.match(r'\d{4}-\d{1,2}-\d{1,2}', date_text):
+            return datetime.strptime(date_text[:10], "%Y-%m-%d").date()
+        
+        # "2025년 12월 05일" 형식
+        match = re.search(r'(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일', date_text)
+        if match:
+            year, month, day = match.groups()
+            return datetime(int(year), int(month), int(day)).date()
+        
+        # "12.05" 형식 (올해로 가정)
+        if re.match(r'^\d{1,2}\.\d{1,2}$', date_text):
+            parts = date_text.split(".")
+            month, day = int(parts[0]), int(parts[1])
+            year = datetime.now().year
+            return datetime(year, month, day).date()
+        
+        # ISO 형식 "2025-12-05T10:30:00"
+        if 'T' in date_text:
+            date_part = date_text.split('T')[0]
+            return datetime.strptime(date_part, "%Y-%m-%d").date()
+        
+        # 숫자만 있는 경우 "20251205"
+        if re.match(r'^\d{8}$', date_text):
+            return datetime.strptime(date_text, "%Y%m%d").date()
+        
+    except Exception as e:
+        print(f"날짜 파싱 오류: {date_text} -> {e}")
+        pass
+    
+    return None
+
+# ===============================
+# 뉴스 본문 + 날짜 크롤링 (수정)
+# ===============================
+def fetch_news_content_and_date(news_url):
+    """뉴스 상세 페이지에서 본문과 날짜 추출"""
     try:
         if "/video/" in news_url:
-            return None
+            return None, None
         
         resp = requests.get(news_url, headers=HEADERS, timeout=15)
         resp.encoding = "EUC-KR"
         soup = BeautifulSoup(resp.text, "html.parser")
         
         if soup.select_one(".video_area, .video_player, #videoPlayer"):
-            return None
+            return None, None
         
+        # 날짜 추출 (여러 방법 시도)
+        news_date = None
+        
+        # 방법 1: article_info의 date 클래스
+        date_elem = soup.select_one(".article_info .date, .article_info .date_time, .article_info .t11, .article_info span.date")
+        if date_elem:
+            date_text = date_elem.get_text().strip()
+            news_date = parse_news_date_from_text(date_text)
+            if news_date:
+                print(f"    ✓ 방법1(article_info)에서 날짜 추출: {news_date}")
+        
+        # 방법 2: 기사 본문 상단의 날짜
+        if not news_date:
+            date_elem = soup.select_one("#articleBodyContents .t11, .article_body .t11, .date, span.t11")
+            if date_elem:
+                date_text = date_elem.get_text().strip()
+                news_date = parse_news_date_from_text(date_text)
+                if news_date:
+                    print(f"    ✓ 방법2(본문상단)에서 날짜 추출: {news_date}")
+        
+        # 방법 3: 메타 태그에서 날짜 추출
+        if not news_date:
+            meta_date = soup.select_one('meta[property="article:published_time"], meta[name="publishdate"], meta[name="date"], meta[property="og:article:published_time"]')
+            if meta_date:
+                date_attr = meta_date.get('content') or meta_date.get('value')
+                if date_attr:
+                    news_date = parse_news_date_from_text(date_attr)
+                    if news_date:
+                        print(f"    ✓ 방법3(메타태그)에서 날짜 추출: {news_date}")
+        
+        # 방법 4: URL에서 날짜 추출 (예: /article/123/20251205)
+        if not news_date:
+            url_match = re.search(r'/(\d{8})/', news_url)
+            if url_match:
+                date_str = url_match.group(1)
+                try:
+                    news_date = datetime.strptime(date_str, "%Y%m%d").date()
+                    print(f"    ✓ 방법4(URL)에서 날짜 추출: {news_date}")
+                except:
+                    pass
+        
+        # 방법 5: 기사 헤더 영역에서 날짜 찾기
+        if not news_date:
+            header_date = soup.select_one(".media_end_head_info_datetime, .press_edit_info, ._article_date")
+            if header_date:
+                date_text = header_date.get_text().strip()
+                news_date = parse_news_date_from_text(date_text)
+                if news_date:
+                    print(f"    ✓ 방법5(헤더)에서 날짜 추출: {news_date}")
+        
+        # 본문 추출
         content = ""
         selectors = [
             "#articleBodyContents",
@@ -277,26 +380,26 @@ def fetch_news_content(news_url):
                     content = text
                     break
         
-        return content if content and len(content) > 50 else None
+        return content if content and len(content) > 50 else None, news_date
         
     except Exception as e:
-        return None
+        print(f"본문/날짜 추출 오류: {e}")
+        return None, None
 
 # ===============================
-# 뉴스 날짜 파싱
+# 뉴스 날짜 파싱 (기존 함수 - 리스트 페이지용)
 # ===============================
 def parse_news_date(date_str):
     """뉴스 날짜 문자열을 DATE 형식으로 변환"""
-    try:
-        if not date_str:
-            return datetime.now().date()
-        if "." in date_str:
-            date_str = date_str.replace(".", "-")
-        if len(date_str) >= 10:
-            date_str = date_str[:10]
-            return datetime.strptime(date_str, "%Y-%m-%d").date()
-    except:
-        pass
+    if not date_str:
+        return datetime.now().date()
+    
+    # parse_news_date_from_text 사용
+    parsed = parse_news_date_from_text(date_str)
+    if parsed:
+        return parsed
+    
+    # 파싱 실패 시 오늘 날짜 반환
     return datetime.now().date()
 
 # ===============================
@@ -353,12 +456,21 @@ def parse_news_list(conn, sid1=101, page=1, date_str=None):
                     skipped_video += 1
                     continue
                 
+                # 리스트 페이지에서 날짜 추출 (백업용)
                 date_elem = article.select_one(".date, .writing, .info, .date_time")
                 date_str_article = date_elem.get_text().strip() if date_elem else ""
-                news_date = parse_news_date(date_str_article)
+                news_date_backup = parse_news_date(date_str_article)
                 
                 print(f"  본문 크롤링 중: {title[:50]}...")
-                content = fetch_news_content(news_url)
+                content, news_date_from_content = fetch_news_content_and_date(news_url)
+                
+                # 본문에서 날짜를 가져왔으면 그것을 사용, 없으면 리스트 페이지 날짜 사용
+                if news_date_from_content:
+                    news_date = news_date_from_content
+                    print(f"    ✓ 본문에서 날짜 추출 성공: {news_date}")
+                else:
+                    news_date = news_date_backup
+                    print(f"    ⚠ 본문에서 날짜 추출 실패, 리스트 페이지 날짜 사용: {news_date}")
                 
                 if not content or len(content.strip()) < 50:
                     content = title + " " + (title_elem.get("title", "") or "")
@@ -386,6 +498,7 @@ def parse_news_list(conn, sid1=101, page=1, date_str=None):
                 time.sleep(0.1)
                 
             except Exception as e:
+                print(f"    ✗ 뉴스 처리 오류: {e}")
                 continue
         
         if skipped_video > 0:
@@ -394,6 +507,7 @@ def parse_news_list(conn, sid1=101, page=1, date_str=None):
         return news_list
         
     except Exception as e:
+        print(f"뉴스 리스트 파싱 오류: {e}")
         return []
 
 # ===============================
@@ -523,7 +637,8 @@ def main():
         print("=" * 60)
         print("※ STOCK_INFO에 있는 종목만 매칭")
         print("※ STOCK_CODE가 없는 뉴스는 스킵하고 다음 뉴스로")
-        print("※ 무조건 100개 추가될 때까지 크롤링\n")
+        print("※ 무조건 100개 추가될 때까지 크롤링")
+        print("※ 본문 페이지에서 정확한 날짜 추출\n")
         
         total_attempted = 0  # 시도한 개수
         total_inserted = 0   # 실제 INSERT된 개수
