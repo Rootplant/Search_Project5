@@ -306,6 +306,7 @@ function MyPage() {
                 ) : (
                     <>
                         <button style={styles.btnPrimary} onClick={() => setIsEditing(true)}>정보 수정</button>
+                        <button style={styles.btnPrimary} onClick={() => navigate('/find-pw')}>비밀번호 변경</button>
                         <button style={styles.btnDanger} onClick={handleWithdraw}>회원 탈퇴</button>
                     </>
                 )}

@@ -248,9 +248,9 @@ function Header() {
                       <DropdownItem onClick={() => navigate('/mypage')}>
                         마이페이지
                       </DropdownItem>
-                      <DropdownItem onClick={() => navigate('/find-pw')}>
+                      {/* <DropdownItem onClick={() => navigate('/find-pw')}>
                         비밀번호 변경
-                      </DropdownItem>
+                      </DropdownItem> */}
                     </>
                   )}
 
