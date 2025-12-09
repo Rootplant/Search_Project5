@@ -1,6 +1,10 @@
 package com.boot.dao;
 
+import com.boot.dto.FavoriteDTO;
 import com.boot.dto.UserInfoDTO;
+
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -59,4 +63,38 @@ public interface UserDAO {
     		@Param("email") String email,
             @Param("fullName") String fullName,
             @Param("provider") String provider);
+    
+
+    // 찜목록 관련
+    void addFavoriteStock(
+    		@Param("email") String email,
+    		@Param("stockCode") String stockCode);
+    
+    void removeFavoriteStock(
+    		@Param("email") String email,
+    		@Param("stockCode") String stockCode);
+    
+    void addFavoriteNews(
+    		@Param("email") String email,
+    		@Param("newsId") Long newsId);
+    
+    void removeFavoriteNews(
+    		@Param("email") String email,
+    		@Param("newsId") Long newsId);
+    
+    // 1. 회원 탈퇴
+    void deleteUser(@Param("email") String email);
+
+    // 2. 회원 정보 수정
+    void updateUserInfo(
+            @Param("email") String email,
+            @Param("fullName") String fullName,
+            @Param("password") String password
+    );
+
+    // 3. 관심 종목 목록 가져오기 (List 반환)
+    List<FavoriteDTO> getFavoriteStocks(@Param("email") String email);
+
+    // 4. 관심 뉴스 목록 가져오기 (List 반환)
+    List<FavoriteDTO> getFavoriteNews(@Param("email") String email);
 }

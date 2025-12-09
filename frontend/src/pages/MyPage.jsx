@@ -1,147 +1,355 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import axios from 'axios';
 
-// 스타일 객체
+// ==========================================
+// 1. 스타일 객체 정의 (styled-components 대체)
+// ==========================================
 const styles = {
   container: {
-    maxWidth: '800px',
+    maxWidth: '1000px',
     margin: '50px auto',
     padding: '20px',
     fontFamily: 'sans-serif',
   },
-  title: {
-    color: '#333',
-    borderBottom: '2px solid #eee',
-    paddingBottom: '15px',
+  header: {
+    borderBottom: '2px solid #333',
+    paddingBottom: '20px',
     marginBottom: '30px',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  title: {
     fontSize: '2em',
     fontWeight: 'bold',
+    color: '#333',
+    margin: 0,
   },
+  tabs: {
+    display: 'flex',
+    gap: '10px',
+    marginBottom: '30px',
+    borderBottom: '1px solid #ddd',
+  },
+  // 탭 버튼 스타일 함수
+  tabButton: (isActive) => ({
+    padding: '12px 24px',
+    cursor: 'pointer',
+    fontSize: '16px',
+    fontWeight: 'bold',
+    border: 'none',
+    background: 'none',
+    color: isActive ? '#007bff' : '#666',
+    borderBottom: isActive ? '3px solid #007bff' : '3px solid transparent',
+    transition: 'all 0.2s',
+  }),
   card: {
     background: 'white',
+    padding: '30px',
     borderRadius: '12px',
     boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
-    padding: '30px',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '20px',
+    marginBottom: '20px',
     border: '1px solid #eee',
   },
-  avatar: {
-    width: '80px',
-    height: '80px',
-    backgroundColor: '#007bff',
-    color: 'white',
-    borderRadius: '50%',
+  row: {
     display: 'flex',
-    justifyContent: 'center',
+    marginBottom: '15px',
     alignItems: 'center',
-    fontSize: '32px',
-    fontWeight: 'bold',
-    flexShrink: 0,
   },
-  info: {
-    flex: 1,
-  },
-  infoH2: {
-    margin: '0 0 5px 0',
-    fontSize: '24px',
-    color: '#333',
-  },
-  infoP: {
-    margin: '0',
-    color: '#666',
-  },
-  badge: {
-    display: 'inline-block',
-    padding: '4px 8px',
-    borderRadius: '4px',
-    background: '#eee',
-    fontSize: '12px',
-    marginTop: '8px',
+  label: {
+    width: '120px',
     fontWeight: 'bold',
     color: '#555',
   },
-  buttonGroup: {
+  value: {
+    flex: 1,
+    color: '#333',
+  },
+  input: {
+    padding: '8px',
+    border: '1px solid #ddd',
+    borderRadius: '4px',
+    width: '200px',
+  },
+  btnGroup: {
+    marginTop: '20px',
     display: 'flex',
     gap: '10px',
   },
-  button: {
+  btnPrimary: {
     padding: '10px 20px',
-    border: '1px solid #ddd',
-    background: 'white',
-    borderRadius: '6px',
+    background: '#007bff',
+    color: 'white',
+    border: 'none',
+    borderRadius: '4px',
     cursor: 'pointer',
     fontWeight: 'bold',
-    fontSize: '14px',
-    color: '#333',
   },
-  section: {
-    marginTop: '30px',
-  },
-  sectionTitle: {
-    fontSize: '1.5em',
+  btnSecondary: {
+    padding: '10px 20px',
+    background: '#6c757d',
+    color: 'white',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
     fontWeight: 'bold',
-    marginBottom: '15px',
   },
-  emptyBox: {
+  btnDanger: {
+    padding: '10px 20px',
+    background: '#dc3545',
+    color: 'white',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontWeight: 'bold',
+  },
+  btnDelete: {
+    padding: '5px 10px',
+    background: '#fff',
+    border: '1px solid #dc3545',
+    color: '#dc3545',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontSize: '12px',
+  },
+  listItem: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '15px',
+    borderBottom: '1px solid #eee',
+  },
+  stockNameLink: {
+    fontWeight: 'bold',
+    fontSize: '18px',
+    color: '#333',
+    textDecoration: 'none',
+    transition: 'color 0.2s',
+    cursor: 'pointer',
+  },
+  stockCode: {
+    fontSize: '12px',
+    color: '#999',
+    marginLeft: '8px',
+  },
+  stockPrice: {
+    color: '#d60000',
+    fontWeight: 'bold',
+  },
+  newsTitle: {
+    textDecoration: 'none',
+    color: '#333',
+    fontSize: '16px',
+    fontWeight: '500',
+    display: 'block',
+    marginBottom: '5px',
+  },
+  newsDate: {
+    fontSize: '12px',
     color: '#888',
-    padding: '20px',
-    background: '#f9f9f9',
-    borderRadius: '8px',
-    textAlign: 'center',
-  }
+  },
 };
 
 function MyPage() {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+  const [activeTab, setActiveTab] = useState('INFO');
+  const [userInfo, setUserInfo] = useState(null);
+  const [favorites, setFavorites] = useState({ stocks: [], news: [] });
+  
+  const [isEditing, setIsEditing] = useState(false);
+  const [editForm, setEditForm] = useState({ fullName: '', password: '' });
 
+  // 1. 데이터 불러오기 (실제 API 호출)
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (!storedUser) {
-      alert("로그인이 필요한 페이지입니다.");
-      navigate('/');
-      return;
-    }
-    setUser(JSON.parse(storedUser));
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+             alert("로그인이 필요합니다.");
+             navigate('/');
+             return;
+        }
+
+        const res = await axios.get('/api/mypage/info');
+        
+        if (res.status === 200) {
+            setUserInfo(res.data.user);
+            setFavorites({ 
+                stocks: res.data.stocks || [], 
+                news: res.data.news || [] 
+            });
+            setEditForm({ fullName: res.data.user.fullName, password: '' });
+        }
+
+      } catch (error) {
+        console.error("데이터 로드 실패", error);
+        alert("정보를 불러올 수 없습니다. 다시 로그인해주세요.");
+      }
+    };
+    fetchData();
   }, [navigate]);
 
-  if (!user) return null;
+  // 2. 정보 수정 핸들러
+  const handleUpdate = async () => {
+    if (!window.confirm("수정하시겠습니까?")) return;
+    try {
+        await axios.put('/api/mypage/update', editForm);
+        alert("정보가 수정되었습니다.");
+        setIsEditing(false);
+        window.location.reload(); 
+    } catch (e) {
+        alert("수정 실패");
+    }
+  };
+
+  // 3. 회원 탈퇴 핸들러
+  const handleWithdraw = async () => {
+    if (window.confirm("정말로 탈퇴하시겠습니까?")) {
+        try {
+            await axios.delete('/api/mypage/withdraw');
+            localStorage.clear();
+            alert("탈퇴가 완료되었습니다.");
+            navigate('/');
+            window.location.reload();
+        } catch (e) {
+            alert("탈퇴 실패");
+        }
+    }
+  };
+
+  // 4. 종목 찜 해제
+  const handleDeleteStock = async (stockCode) => {
+    if (!window.confirm("삭제하시겠습니까?")) return;
+    try {
+      await axios.delete(`/api/mypage/favorites/stock/${stockCode}`);
+      alert("삭제되었습니다.");
+      window.location.reload(); 
+    } catch (e) {
+      alert("삭제 실패");
+    }
+  };
+
+  // 5. 뉴스 스크랩 해제
+  const handleDeleteNews = async (newsId) => {
+    if (!window.confirm("삭제하시겠습니까?")) return;
+    try {
+      await axios.delete(`/api/mypage/favorites/news/${newsId}`);
+      alert("삭제되었습니다.");
+      window.location.reload();
+    } catch (e) {
+      alert("삭제 실패");
+    }
+  };
+
+  if (!userInfo) return <div style={{textAlign:'center', marginTop:'50px'}}>로딩중...</div>;
 
   return (
     <div style={styles.container}>
-      <h1 style={styles.title}>마이페이지</h1>
-
-      <div style={styles.card}>
-        <div style={styles.avatar}>
-          {user.fullName ? user.fullName.charAt(0) : 'U'}
-        </div>
-        
-        <div style={styles.info}>
-          <h2 style={styles.infoH2}>{user.fullName || '회원'}님</h2>
-          <p style={styles.infoP}>{user.email}</p>
-          {user.provider && (
-            <span style={styles.badge}>{user.provider} 로그인</span>
-          )}
-        </div>
-
-        <div style={styles.buttonGroup}>
-           <button 
-             style={styles.button}
-             onClick={() => alert('준비 중인 기능입니다.')}
-           >
-             내 정보 수정
-           </button>
-        </div>
+      <div style={styles.header}>
+        <h1 style={styles.title}>마이페이지</h1>
       </div>
 
-      <div style={styles.section}>
-        <h3 style={styles.sectionTitle}>⭐ 관심 종목</h3>
-        <div style={styles.emptyBox}>
-            아직 관심 종목이 없습니다.
-        </div>
+      <div style={styles.tabs}>
+        <button style={styles.tabButton(activeTab === 'INFO')} onClick={() => setActiveTab('INFO')}>내 정보</button>
+        <button style={styles.tabButton(activeTab === 'STOCK')} onClick={() => setActiveTab('STOCK')}>관심 종목</button>
+        <button style={styles.tabButton(activeTab === 'NEWS')} onClick={() => setActiveTab('NEWS')}>스크랩 뉴스</button>
       </div>
+
+      {/* 1. 내 정보 탭 */}
+      {activeTab === 'INFO' && (
+        <div style={styles.card}>
+            <div style={styles.row}>
+                <span style={styles.label}>이메일</span>
+                <span style={styles.value}>{userInfo.email}</span>
+            </div>
+            <div style={styles.row}>
+                <span style={styles.label}>이름</span>
+                {isEditing ? (
+                    <input style={styles.input} value={editForm.fullName} 
+                        onChange={(e) => setEditForm({...editForm, fullName: e.target.value})} />
+                ) : (
+                    <span style={styles.value}>{userInfo.fullName}</span>
+                )}
+            </div>
+            {isEditing && (
+                <div style={styles.row}>
+                    <span style={styles.label}>새 비밀번호</span>
+                    <input type="password" style={styles.input} placeholder="변경시에만 입력"
+                        value={editForm.password}
+                        onChange={(e) => setEditForm({...editForm, password: e.target.value})} />
+                </div>
+            )}
+            <div style={styles.btnGroup}>
+                {isEditing ? (
+                    <>
+                        <button style={styles.btnPrimary} onClick={handleUpdate}>저장</button>
+                        <button style={styles.btnSecondary} onClick={() => setIsEditing(false)}>취소</button>
+                    </>
+                ) : (
+                    <>
+                        <button style={styles.btnPrimary} onClick={() => setIsEditing(true)}>정보 수정</button>
+                        <button style={styles.btnDanger} onClick={handleWithdraw}>회원 탈퇴</button>
+                    </>
+                )}
+            </div>
+        </div>
+      )}
+
+      {/* 2. 관심 종목 탭 */}
+      {activeTab === 'STOCK' && (
+          <div style={styles.card}>
+              {favorites.stocks.length === 0 ? <p style={{color:'#888'}}>찜한 종목이 없습니다.</p> : 
+                favorites.stocks.map((stock, idx) => (
+                    <div key={idx} style={styles.listItem}>
+                        <div>
+                            {/* StockLink 대신 Link 태그에 직접 스타일 적용 */}
+                            <Link 
+                                to={`/stock/${stock.stockCode}`}
+                                style={styles.stockNameLink}
+                                onMouseOver={(e) => {
+                                    e.currentTarget.style.textDecoration = 'underline';
+                                    e.currentTarget.style.color = '#007bff';
+                                }}
+                                onMouseOut={(e) => {
+                                    e.currentTarget.style.textDecoration = 'none';
+                                    e.currentTarget.style.color = '#333';
+                                }}
+                            >
+                                {stock.stockName}
+                            </Link>
+                            <span style={styles.stockCode}>
+                                {stock.stockCode}
+                            </span>
+                        </div>
+                        <div style={{display:'flex', alignItems:'center', gap:'15px'}}>
+                            <span style={styles.stockPrice}>
+                                {stock.price ? stock.price.toLocaleString() : '-'}원
+                            </span>
+                            <button style={styles.btnDelete} onClick={() => handleDeleteStock(stock.stockCode)}>삭제</button>
+                        </div>
+                    </div>
+                ))
+              }
+          </div>
+      )}
+
+      {/* 3. 스크랩 뉴스 탭 */}
+      {activeTab === 'NEWS' && (
+          <div style={styles.card}>
+              {favorites.news.length === 0 ? <p style={{color:'#888'}}>스크랩한 뉴스가 없습니다.</p> : 
+                favorites.news.map((news, idx) => (
+                    <div key={idx} style={styles.listItem}>
+                        <div style={{flex:1}}>
+                            <a href={news.newsUrl} target="_blank" rel="noopener noreferrer" style={styles.newsTitle}>{news.newsTitle}</a>
+                            <div style={styles.newsDate}>{news.newsDate}</div>
+                        </div>
+                        <button style={styles.btnDelete} onClick={() => handleDeleteNews(news.newsId)}>삭제</button>
+                    </div>
+                ))
+              }
+          </div>
+      )}
     </div>
   );
 }

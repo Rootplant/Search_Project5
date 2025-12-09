@@ -1,0 +1,18 @@
+package com.boot.dto;
+import lombok.Data;
+
+@Data
+public class FavoriteDTO {
+    private String email;
+    private String stockCode;
+    private Long newsId;
+    
+    // 조인을 통해 가져올 추가 정보들 (화면에 보여줄 것)
+    private String stockName;
+    private Double price;
+    private Double changeRate;
+    
+    private String newsTitle;
+    private String newsUrl;
+    private String newsDate;
+}

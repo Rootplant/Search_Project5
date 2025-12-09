@@ -209,4 +209,83 @@
 	        'ACTIVE'
 	    )
 	</insert>
+	
+	
+	
+	<!-- 1. 내 정보 수정 -->
+	<update id="updateUserInfo">
+	    UPDATE USER_INFO
+	    SET 
+	        FULL_NAME = #{fullName}
+	        <if test="password != null and password != ''">
+	            , PASSWORD = #{password}
+	        </if>
+	    WHERE EMAIL = #{email}
+	</update>
+	
+	<!-- 2. 회원 탈퇴 -->
+	<delete id="deleteUser">
+	    DELETE FROM USER_INFO WHERE EMAIL = #{email}
+	</delete>
+	
+	<!-- 3. 관심 종목 목록 조회 (STOCK_INFO와 조인) -->
+	<select id="getFavoriteStocks" resultType="com.boot.dto.FavoriteDTO">
+	    SELECT 
+	        F.STOCK_CODE, 
+	        S.STOCK_NAME, 
+	        S.PRICE, 
+	        S.CHANGE_RATE
+	    FROM USER_FAVORITE_STOCK F
+	    JOIN STOCK_INFO S ON F.STOCK_CODE = S.STOCK_CODE
+	    WHERE F.EMAIL = #{email}
+	    ORDER BY F.CREATED_AT DESC
+	</select>
+	
+	<!-- 4. 관심 뉴스 목록 조회 (STOCK_NEWS와 조인) -->
+	<select id="getFavoriteNews" resultType="com.boot.dto.FavoriteDTO">
+	    SELECT 
+	        F.NEWS_ID, 
+	        N.TITLE AS newsTitle, 
+	        N.URL AS newsUrl, 
+	        TO_CHAR(N.NEWS_DATE, 'YYYY-MM-DD') AS newsDate
+	    FROM USER_FAVORITE_NEWS F
+	    JOIN STOCK_NEWS N ON F.NEWS_ID = N.NEWS_ID
+	    WHERE F.EMAIL = #{email}
+	    ORDER BY F.CREATED_AT DESC
+	</select>
+	
+
+    <!-- ======================= -->
+    <!--      관심 종목 (Stock)   -->
+    <!-- ======================= -->
+    
+    <!-- 찜 추가 (중복 방지를 위해 MERGE나 INSERT IGNORE를 쓰기도 하지만, 여기선 기본 INSERT) -->
+    <insert id="addFavoriteStock">
+        INSERT INTO USER_FAVORITE_STOCK (EMAIL, STOCK_CODE)
+        VALUES (#{email}, #{stockCode})
+    </insert>
+
+    <!-- 찜 삭제 -->
+    <delete id="removeFavoriteStock">
+        DELETE FROM USER_FAVORITE_STOCK 
+        WHERE EMAIL = #{email} AND STOCK_CODE = #{stockCode}
+    </delete>
+
+
+    <!-- ======================= -->
+    <!--      관심 뉴스 (News)    -->
+    <!-- ======================= -->
+
+    <!-- 뉴스 스크랩 추가 -->
+    <insert id="addFavoriteNews">
+        INSERT INTO USER_FAVORITE_NEWS (EMAIL, NEWS_ID)
+        VALUES (#{email}, #{newsId})
+    </insert>
+
+    <!-- 뉴스 스크랩 삭제 (뉴스 ID 기준) -->
+    <delete id="removeFavoriteNews">
+        DELETE FROM USER_FAVORITE_NEWS
+        WHERE EMAIL = #{email} AND NEWS_ID = #{newsId}
+    </delete>
+
 </mapper>

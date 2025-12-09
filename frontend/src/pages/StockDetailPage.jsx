@@ -2,7 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 
-// 스타일 객체 정의
+// ==========================================
+// 1. 스타일 객체 정의
+// ==========================================
 const styles = {
   container: {
     maxWidth: '1000px',
@@ -14,6 +16,15 @@ const styles = {
     borderBottom: '2px solid #333',
     paddingBottom: '20px',
     marginBottom: '30px',
+  },
+  headerTop: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  stockTitleGroup: {
+    display: 'flex',
+    flexDirection: 'column',
   },
   stockTitle: {
     margin: '0',
@@ -44,14 +55,18 @@ const styles = {
     fontWeight: '500',
     marginBottom: '8px',
   },
+  // ⭐ [복구됨] 메타 데이터 스타일
   metaData: {
-    marginTop: '10px',
+    marginTop: '15px',
     fontSize: '14px',
     color: '#666',
+    display: 'flex',
+    gap: '20px',
   },
   metaSpan: {
-    marginRight: '15px',
+    display: 'inline-block',
   },
+  
   section: {
     marginBottom: '40px',
     backgroundColor: 'white',
@@ -118,21 +133,53 @@ const styles = {
   noNews: {
     textAlign: 'center',
     color: '#888',
-  }
+  },
+  starButton: {
+    background: 'none',
+    border: 'none',
+    fontSize: '40px',
+    cursor: 'pointer',
+    color: '#FFD700',
+    transition: 'transform 0.2s',
+    padding: '0 10px',
+  },
+  starButtonEmpty: {
+    color: '#ccc',
+  },
 };
+
+// ==========================================
+// 2. 컴포넌트 로직
+// ==========================================
 
 function StockDetailPage() {
   const { stockCode } = useParams();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  
+  const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
-    const fetchDetail = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`/api/stocks/${stockCode}`);
-        console.log("상세 정보 수신:", response.data);
-        setData(response.data);
+        const stockRes = await axios.get(`/api/stocks/${stockCode}`);
+        console.log("상세 정보 수신:", stockRes.data);
+        setData(stockRes.data);
+
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+            try {
+                const myRes = await axios.get('/api/mypage/info', {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                const myStocks = myRes.data.stocks || [];
+                const isFav = myStocks.some(s => s.stockCode === stockCode);
+                setIsFavorite(isFav);
+            } catch (e) {
+                console.error("찜 상태 확인 실패:", e);
+            }
+        }
       } catch (error) {
         console.error("상세 정보 조회 실패", error);
         alert("정보를 불러오는데 실패했습니다.");
@@ -140,57 +187,90 @@ function StockDetailPage() {
         setLoading(false);
       }
     };
-    fetchDetail();
+    fetchData();
   }, [stockCode]);
+
+  const handleToggleFavorite = async () => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+        alert("로그인이 필요한 기능입니다.");
+        return;
+    }
+
+    try {
+        if (isFavorite) {
+            await axios.delete(`/api/mypage/favorites/stock/${stockCode}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setIsFavorite(false);
+            alert("관심 종목에서 삭제되었습니다.");
+        } else {
+            await axios.post('/api/mypage/favorites/stock', { stockCode }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setIsFavorite(true);
+            alert("관심 종목에 추가되었습니다.");
+        }
+    } catch (error) {
+        console.error("찜하기 실패", error);
+        alert("처리에 실패했습니다.");
+    }
+  };
 
   if (loading) return <div style={styles.container}>로딩중...</div>;
   if (!data) return <div style={styles.container}>데이터가 없습니다.</div>;
 
   const { stockInfo, newsList, sentiment } = data;
 
-  // ⭐ [수정] 등락 로직 강화
-  // priceChange가 0이어도, changeRate(%)가 있으면 상승/하락으로 판정합니다.
   const changeRate = stockInfo.changeRate || 0;
   const priceChange = stockInfo.priceChange || 0;
 
-  // 둘 중 하나라도 양수면 상승, 음수면 하락
   const isRising = changeRate > 0 || priceChange > 0;
   const isFalling = changeRate < 0 || priceChange < 0;
 
-  // 색상 및 기호 결정
   const priceColor = isRising ? '#d60000' : isFalling ? '#0051c7' : '#333';
   const priceSign = isRising ? '▲' : isFalling ? '▼' : '-';
 
   return (
     <div style={styles.container}>
-      {/* 1. 헤더 정보 */}
       <div style={styles.header}>
-        <h1 style={styles.stockTitle}>
-          {stockInfo.stockName} <span style={styles.stockCode}>{stockInfo.stockCode}</span>
-        </h1>
-        
-        <div style={styles.priceContainer}>
-          {/* ⭐ [적용] 가격에도 색상 적용 */}
-          <div style={{ ...styles.price, color: priceColor }}>
-            {stockInfo.price ? stockInfo.price.toLocaleString() : 0}원
-          </div>
-          
-          {/* ⭐ [적용] 등락폭 및 등락률 표시 */}
-          <div style={{ ...styles.changeInfo, color: priceColor }}>
-            {priceSign} {Math.abs(priceChange).toLocaleString()} 
-            <span style={{ marginLeft: '5px' }}>({changeRate}%)</span>
-          </div>
+        {/* 상단: 이름/가격 + 찜버튼 */}
+        <div style={styles.headerTop}>
+            <div style={styles.stockTitleGroup}>
+                <h1 style={styles.stockTitle}>
+                {stockInfo.stockName} <span style={styles.stockCode}>{stockInfo.stockCode}</span>
+                </h1>
+                
+                <div style={styles.priceContainer}>
+                    <div style={{ ...styles.price, color: priceColor }}>
+                        {stockInfo.price ? stockInfo.price.toLocaleString() : 0}원
+                    </div>
+                    <div style={{ ...styles.changeInfo, color: priceColor }}>
+                        {priceSign} {Math.abs(priceChange).toLocaleString()} 
+                        <span style={{ marginLeft: '5px' }}>({changeRate}%)</span>
+                    </div>
+                </div>
+            </div>
+
+            <button 
+                style={{ ...styles.starButton, ...(isFavorite ? {} : styles.starButtonEmpty) }} 
+                onClick={handleToggleFavorite}
+                title={isFavorite ? "관심종목 해제" : "관심종목 추가"}
+            >
+                {isFavorite ? '★' : '☆'}
+            </button>
         </div>
 
+        {/* ⭐ [복구 완료] 하단: 시장/업종/시총/기준일 */}
         <div style={styles.metaData}>
-            <span style={styles.metaSpan}>시장: {stockInfo.marketType}</span>
-            <span style={styles.metaSpan}>업종: {stockInfo.industry}</span>
-            <span style={styles.metaSpan}>시가총액: {stockInfo.marketCap}</span>
-            <span style={styles.metaSpan}>기준일: {stockInfo.updatedAt}</span>
+            <span style={styles.metaSpan}><strong>시장:</strong> {stockInfo.marketType || '-'}</span>
+            <span style={styles.metaSpan}><strong>업종:</strong> {stockInfo.industry || '-'}</span>
+            <span style={styles.metaSpan}><strong>시가총액:</strong> {stockInfo.marketCap || '-'}</span>
+            <span style={styles.metaSpan}><strong>기준일:</strong> {stockInfo.updatedAt || '-'}</span>
         </div>
       </div>
 
-      {/* 2. 감성 분석 요약 */}
+      {/* 감성 분석 */}
       <div style={styles.section}>
         <h3 style={styles.sectionTitle}>🤖 AI 뉴스 감성 분석</h3>
         <div style={styles.sentimentBarContainer}>
@@ -201,14 +281,13 @@ function StockDetailPage() {
             </div>
             
             <div style={styles.sentimentStats}>
-                <div style={{ color: '#d60000' }}>긍정 {sentiment?.positiveCount}건 ({sentiment?.positiveRate}%)</div>
-                <div style={{ color: '#0051c7' }}>부정 {sentiment?.negativeCount}건 ({sentiment?.negativeRate}%)</div>
-                <div style={{ color: '#666' }}>중립 {sentiment?.neutralCount}건</div>
+                <div style={{ color: '#d60000' }}>긍정 {sentiment?.positiveCount}건</div>
+                <div style={{ color: '#0051c7' }}>부정 {sentiment?.negativeCount}건</div>
             </div>
         </div>
       </div>
 
-      {/* 3. 뉴스 리스트 */}
+      {/* 뉴스 리스트 */}
       <div style={styles.section}>
         <h3 style={styles.sectionTitle}>📰 관련 주요 뉴스</h3>
         {newsList && newsList.length > 0 ? (
