@@ -33,9 +33,10 @@ public interface AdminDAO {
     
     //계정 강제 로그아웃
     void forceLogout(String email);
-//
-//    List<Map<String,Object>> getTokens();
-//
+    
+    //Refresh Token 전체 조회
+    List<Map<String,Object>> getTokens();
+
 //    void clearTokens();
 //
 //    List<Map<String,Object>> getLoginLog();

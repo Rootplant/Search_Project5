@@ -160,10 +160,11 @@ public class AdminService {
 
         return ResponseEntity.ok("해당 사용자가 강제 로그아웃되었습니다.");
     }
-//
-//    public ResponseEntity<?> getTokens() {
-//        return ResponseEntity.ok(adminDAO.getTokens());
-//    }
+    
+    // Refresh Token 전체 조회
+    public ResponseEntity<?> getTokens() {
+        return ResponseEntity.ok(adminDAO.getTokens());
+    }
 //
 //    public ResponseEntity<?> deleteToken(String email) {
 //        adminDAO.forceLogout(email);

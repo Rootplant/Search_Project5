@@ -99,12 +99,16 @@
         WHERE EMAIL = #{email}
     </update>
 
-<!--     Refresh Token 목록 -->
-<!--    <select id="getTokens" resultType="map">-->
-<!--        SELECT EMAIL, REFRESH_TOKEN-->
-<!--        FROM USER_INFO-->
-<!--        WHERE REFRESH_TOKEN IS NOT NULL-->
-<!--    </select>-->
+	<!-- Refresh Token 목록 -->
+    <select id="getTokens" resultType="map">
+        SELECT 
+	        EMAIL,
+	        REFRESH_TOKEN,
+	        TO_CHAR(CREATED_AT, 'YYYY-MM-DD HH24:MI:SS') AS CREATED_AT
+	    FROM USER_INFO
+	    WHERE REFRESH_TOKEN IS NOT NULL
+	    ORDER BY CREATED_AT DESC
+    </select>
 
 <!--     전체 토큰 초기화 -->
 <!--    <update id="clearTokens">-->

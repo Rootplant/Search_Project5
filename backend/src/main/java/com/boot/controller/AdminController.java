@@ -49,12 +49,12 @@ public class AdminController {
     public ResponseEntity<?> forceLogout(@RequestParam String email) {
         return adminService.forceLogout(email);
     }
-//
-//    // ✔ Refresh Token 목록 조회
-//    @GetMapping("/tokens")
-//    public ResponseEntity<?> getTokens() {
-//        return adminService.getTokens();
-//    }
+
+    // ✔ Refresh Token 목록 조회
+    @GetMapping("/tokens")
+    public ResponseEntity<?> getTokens() {
+        return adminService.getTokens();
+    }
 //
 //    // ✔ 특정 사용자 Refresh Token 삭제
 //    @DeleteMapping("/tokens/{email}")
