@@ -3,8 +3,6 @@ import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 // 🔴 경로: src 폴더 내의 layouts 폴더
 import MainLayout from './layouts/MainLayout'; 
-//관리자 레이아웃
-import AdminLayout from './layouts/AdminLayout';
 import FavoritesPage from './pages/FavoritesPage';
 // 🔴 경로: src 폴더 내의 pages 폴더
 import HomePage from './pages/HomePage';
@@ -21,12 +19,6 @@ import LoginPage from './pages/Login';
 import Signup from './pages/Signup';
 import FindPw from './pages/find_pw';
 import VerifyPage from './pages/VerifyPage';
-//관리자 페이지
-import AdminDashboardPage from './pages/admin/AdminDashboardPage';
-import AdminUserListPage from './pages/admin/AdminUserListPage';
-import AdminRolePage from './pages/admin/AdminRolePage';
-import AdminRefreshPage from './pages/admin/AdminRefreshPage';
-import AdminLogPage from './pages/admin/AdminLogPage';
 
 import TestStockDetailPage from './pages/TestStockDetailPage';
 
@@ -36,9 +28,6 @@ import ResetPasswordPage from './pages/ResetPasswordPage';
 import SocialLoginCallback from './pages/SocialLoginCallback';
 import MyPage from './pages/MyPage';
 import MobileApprovePage from './pages/MobileApprovePage';
-
-//관리자 권한 판단
-import AdminRoute from './routes/AdminRoute';
 
 import StockTest from "./pages/StockTest";
 
@@ -70,22 +59,6 @@ function App() {
             <Route path="oauth/callback/google" element={<SocialLoginCallback provider="google" />} />
             <Route path="mobile-approve" element={<MobileApprovePage />} />
             <Route path="/stock/test/:code" element={<StockTest />} />
-          </Route>
-
-          {/*관리자 페이지*/}
-          <Route 
-            path="/admin"
-            element={
-              <AdminRoute>
-                <AdminLayout />
-              </AdminRoute>
-            }
-          >
-            <Route path="dashboard" element={<AdminDashboardPage />} />
-            <Route path="users" element={<AdminUserListPage />} />
-            <Route path="roles" element={<AdminRolePage />} />
-            <Route path="refresh" element={<AdminRefreshPage />} />
-            <Route path="logs" element={<AdminLogPage />} />
           </Route>
         </Routes>
       </AuthProvider>
