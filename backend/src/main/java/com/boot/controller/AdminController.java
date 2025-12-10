@@ -1,5 +1,6 @@
 package com.boot.controller;
 
+import com.boot.dto.ChangeRoleDTO;
 import com.boot.dto.SuspendRequestDTO;
 import com.boot.service.AdminService;
 import lombok.RequiredArgsConstructor;
@@ -31,15 +32,12 @@ public class AdminController {
         return adminService.unsuspendUser(email);
     }
 
-//    // ✔ 권한 변경
-//    @PostMapping("/users/{email}/role")
-//    public ResponseEntity<?> changeRole(
-//            @PathVariable String email,
-//            @RequestParam String role
-//    ) {
-//        return adminService.changeRole(email, role);
-//    }
-//
+    // ✔ 권한 변경
+    @PutMapping("/user/role")
+    public ResponseEntity<?> changeUserRole(@RequestBody ChangeRoleDTO dto) {
+        return adminService.changeUserRole(dto);
+    }
+
 //    // ✔ 로그인 실패 횟수 초기화
 //    @PostMapping("/users/{email}/reset-fail")
 //    public ResponseEntity<?> resetFail(@PathVariable String email) {

@@ -21,10 +21,13 @@ public interface AdminDAO {
 		             @Param("reason") String reason);
     //계정 정지 해제
     void unsuspendUser(String email);
+    
+    //권한 변경
+    UserInfoDTO findUserByEmail(String email);
 
-//    void changeRole(@Param("email") String email,
-//                    @Param("role") String role);
-//
+    void updateUserRole(@Param("email") String email,
+                        @Param("role") String role);
+
 //    void resetFail(String email);
 //
 //    void forceLogout(String email);

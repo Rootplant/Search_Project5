@@ -1,6 +1,7 @@
 package com.boot.service;
 
 import com.boot.dao.AdminDAO;
+import com.boot.dto.ChangeRoleDTO;
 import com.boot.dto.SuspendRequestDTO;
 
 import lombok.RequiredArgsConstructor;
@@ -62,11 +63,56 @@ public class AdminService {
         return ResponseEntity.ok("정지 해제 완료");
     }
 
-//    public ResponseEntity<?> changeRole(String email, String role) {
-//        adminDAO.changeRole(email, role);
-//        adminDAO.insertAdminLog("ROLE_CHANGE", email, "권한 변경: " + role);
-//        return ResponseEntity.ok("권한 변경 완료");
-//    }
+    public ResponseEntity<?> changeUserRole(ChangeRoleDTO dto) {
+    	
+    	String email = dto.getEmail();
+        String newRole = dto.getNewRole();
+        
+        // 1) 권한 유효성 체크
+        if (!"USER".equals(newRole) && !"ADMIN".equals(newRole)) {
+            return ResponseEntity.status(400)
+                    .body("role 값은 USER 또는 ADMIN만 가능합니다.");
+        }
+
+        // 2) 대상 유저 조회
+        var user = adminDAO.findUserByEmail(email);
+        if (user == null) {
+            return ResponseEntity.status(404).body("해당 사용자를 찾을 수 없습니다.");
+        }
+
+        // 🚫 3) 정지된 계정이면 권한 변경 금지
+        if ("Y".equals(user.getIsSuspended())) {
+            return ResponseEntity.status(403)
+                    .body("🚫 정지된 계정의 권한은 변경할 수 없습니다.");
+        }
+
+        // 🚫 4) 이메일 인증 되지 않은 계정의 권한 변경 금지
+        if (!"ACTIVE".equals(user.getAccountStatus())) {
+            return ResponseEntity.status(403)
+                    .body("🚫 이메일 인증이 완료되지 않은 계정은 권한을 변경할 수 없습니다.");
+        }
+
+        // ✔ 이미 같은 권한이면 변경 불필요
+        if (newRole.equals(user.getRole())) {
+            return ResponseEntity.ok("이미 '" + newRole + "' 권한입니다.");
+        }
+
+        String oldRole = user.getRole();
+
+        // 5) DB 업데이트
+        adminDAO.updateUserRole(email, newRole);
+
+        // 6) 관리자 로그 기록
+        adminDAO.insertAdminLog(
+                "ADMIN",
+                email,
+                "ROLE_CHANGE",
+                "권한 변경: " + oldRole + " → " + newRole
+        );
+
+        return ResponseEntity.ok("권한이 성공적으로 " + newRole + "로 변경되었습니다.");
+    }
+
 //
 //    public ResponseEntity<?> resetFail(String email) {
 //        adminDAO.resetFail(email);

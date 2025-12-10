@@ -62,12 +62,27 @@
         WHERE EMAIL = #{email}
     </update>
 
-<!--     권한 변경 -->
-<!--    <update id="changeRole">-->
-<!--        UPDATE USER_INFO-->
-<!--        SET ROLE = #{role}-->
-<!--        WHERE EMAIL = #{email}-->
-<!--    </update>-->
+	<!-- 사용자 조회 -->
+	<select id="findUserByEmail" resultMap="userMap">
+	    SELECT 
+	        EMAIL,
+	        FULL_NAME,
+	        ROLE,
+	        IS_SUSPENDED,
+	        SUSPEND_UNTIL,
+	        SUSPEND_REASON,
+	        PROVIDER,
+	        ACCOUNT_STATUS
+	    FROM USER_INFO
+	    WHERE EMAIL = #{email}
+	</select>
+	
+	<!-- 권한 변경 -->
+	<update id="updateUserRole">
+	    UPDATE USER_INFO
+	    SET ROLE = #{role}
+	    WHERE EMAIL = #{email}
+	</update>
 
 <!--     로그인 실패 초기화 -->
 <!--    <update id="resetFail">-->
