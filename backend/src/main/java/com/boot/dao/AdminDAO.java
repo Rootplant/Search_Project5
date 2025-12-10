@@ -28,7 +28,8 @@ public interface AdminDAO {
     void updateUserRole(@Param("email") String email,
                         @Param("role") String role);
 
-//    void resetFail(String email);
+    //로그인 시도 횟수 초기화
+    int resetLoginFail(String email);
 //
 //    void forceLogout(String email);
 //

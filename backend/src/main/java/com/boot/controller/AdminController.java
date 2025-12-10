@@ -38,11 +38,11 @@ public class AdminController {
         return adminService.changeUserRole(dto);
     }
 
-//    // ✔ 로그인 실패 횟수 초기화
-//    @PostMapping("/users/{email}/reset-fail")
-//    public ResponseEntity<?> resetFail(@PathVariable String email) {
-//        return adminService.resetFail(email);
-//    }
+    // ✔ 로그인 실패 횟수 초기화
+    @PutMapping("/user/reset-fail")
+    public ResponseEntity<?> resetFail(@RequestParam String email) {
+        return adminService.resetLoginFail(email);
+    }
 //
 //    // ✔ 강제 로그아웃
 //    @PostMapping("/users/{email}/logout")

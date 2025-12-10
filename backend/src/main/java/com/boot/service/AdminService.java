@@ -113,12 +113,29 @@ public class AdminService {
         return ResponseEntity.ok("권한이 성공적으로 " + newRole + "로 변경되었습니다.");
     }
 
-//
-//    public ResponseEntity<?> resetFail(String email) {
-//        adminDAO.resetFail(email);
-//        adminDAO.insertAdminLog("RESET_FAIL", email, "로그인 실패 횟수 초기화");
-//        return ResponseEntity.ok("초기화 완료");
-//    }
+    //로그인 횟수 초기화
+    public ResponseEntity<?> resetLoginFail(String email) {
+
+        // 1) 사용자 존재 확인
+        var user = adminDAO.findUserByEmail(email);
+        if (user == null) {
+            return ResponseEntity.status(404)
+                    .body("해당 사용자를 찾을 수 없습니다.");
+        }
+
+        // 2) 실패 횟수와 잠금 해제
+        adminDAO.resetLoginFail(email);
+
+        // 3) 관리자 로그 기록
+        adminDAO.insertAdminLog(
+                "ADMIN",
+                email,
+                "RESET_FAIL",
+                "로그인 실패 횟수 초기화 + 계정 잠금 해제"
+        );
+
+        return ResponseEntity.ok("로그인 실패 횟수가 초기화되었습니다.");
+    }
 //
 //    public ResponseEntity<?> forceLogout(String email) {
 //        adminDAO.forceLogout(email);

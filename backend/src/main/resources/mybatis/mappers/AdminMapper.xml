@@ -85,11 +85,12 @@
 	</update>
 
 <!--     로그인 실패 초기화 -->
-<!--    <update id="resetFail">-->
-<!--        UPDATE USER_INFO-->
-<!--        SET LOGIN_FAIL_COUNT = 0-->
-<!--        WHERE EMAIL = #{email}-->
-<!--    </update>-->
+    <update id="resetLoginFail">
+        UPDATE USER_INFO
+        SET LOGIN_FAIL_COUNT = 0,
+        LOCK_UNTIL = NULL
+        WHERE EMAIL = #{email}
+    </update>
 
 <!--     강제 로그아웃 -->
 <!--    <update id="forceLogout">-->
