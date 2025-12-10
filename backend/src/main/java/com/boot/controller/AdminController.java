@@ -43,12 +43,12 @@ public class AdminController {
     public ResponseEntity<?> resetFail(@RequestParam String email) {
         return adminService.resetLoginFail(email);
     }
-//
-//    // ✔ 강제 로그아웃
-//    @PostMapping("/users/{email}/logout")
-//    public ResponseEntity<?> forceLogout(@PathVariable String email) {
-//        return adminService.forceLogout(email);
-//    }
+
+    // ✔ 강제 로그아웃
+    @PutMapping("/user/logout")
+    public ResponseEntity<?> forceLogout(@RequestParam String email) {
+        return adminService.forceLogout(email);
+    }
 //
 //    // ✔ Refresh Token 목록 조회
 //    @GetMapping("/tokens")

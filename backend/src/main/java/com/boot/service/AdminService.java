@@ -136,12 +136,30 @@ public class AdminService {
 
         return ResponseEntity.ok("로그인 실패 횟수가 초기화되었습니다.");
     }
-//
-//    public ResponseEntity<?> forceLogout(String email) {
-//        adminDAO.forceLogout(email);
-//        adminDAO.insertAdminLog("FORCE_LOGOUT", email, "강제 로그아웃");
-//        return ResponseEntity.ok("로그아웃 완료");
-//    }
+    
+    //계정 강제 로그아웃
+    public ResponseEntity<?> forceLogout(String email) {
+
+        // 1) 사용자 존재 확인
+        var user = adminDAO.findUserByEmail(email);
+        if (user == null) {
+            return ResponseEntity.status(404)
+                    .body("해당 사용자를 찾을 수 없습니다.");
+        }
+
+        // 2) refresh token 제거 → 강제 로그아웃
+        adminDAO.forceLogout(email);
+
+        // 3) 관리자 로그 기록
+        adminDAO.insertAdminLog(
+                "ADMIN",
+                email,
+                "FORCE_LOGOUT",
+                "강제 로그아웃 수행"
+        );
+
+        return ResponseEntity.ok("해당 사용자가 강제 로그아웃되었습니다.");
+    }
 //
 //    public ResponseEntity<?> getTokens() {
 //        return ResponseEntity.ok(adminDAO.getTokens());

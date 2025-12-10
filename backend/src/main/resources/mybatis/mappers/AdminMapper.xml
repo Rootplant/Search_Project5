@@ -84,7 +84,7 @@
 	    WHERE EMAIL = #{email}
 	</update>
 
-<!--     로그인 실패 초기화 -->
+	<!-- 로그인 실패 초기화 -->
     <update id="resetLoginFail">
         UPDATE USER_INFO
         SET LOGIN_FAIL_COUNT = 0,
@@ -92,12 +92,12 @@
         WHERE EMAIL = #{email}
     </update>
 
-<!--     강제 로그아웃 -->
-<!--    <update id="forceLogout">-->
-<!--        UPDATE USER_INFO-->
-<!--        SET REFRESH_TOKEN = NULL-->
-<!--        WHERE EMAIL = #{email}-->
-<!--    </update>-->
+	<!-- 강제 로그아웃 -->
+    <update id="forceLogout">
+        UPDATE USER_INFO
+        SET REFRESH_TOKEN = NULL
+        WHERE EMAIL = #{email}
+    </update>
 
 <!--     Refresh Token 목록 -->
 <!--    <select id="getTokens" resultType="map">-->
