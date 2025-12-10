@@ -138,11 +138,12 @@ const styles = {
   },
   newsTitle: {
     textDecoration: 'none',
-    color: '#333',
+    // color는 동적으로 처리하므로 여기서 뺌 (아래 렌더링 부분 참고)
     fontSize: '16px',
     fontWeight: '500',
     display: 'block',
     marginBottom: '5px',
+    cursor: 'pointer',
   },
   newsDate: {
     fontSize: '12px',
@@ -161,9 +162,9 @@ function MyPage() {
   const [favorites, setFavorites] = useState({ stocks: [], news: [] });
   
   const [isEditing, setIsEditing] = useState(false);
-  const [editForm, setEditForm] = useState({ fullName: '' }); // 이름만 수정
+  const [editForm, setEditForm] = useState({ fullName: '' });
 
-  // 1. 데이터 불러오기 (실제 API 호출)
+  // 1. 데이터 불러오기
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -174,7 +175,9 @@ function MyPage() {
              return;
         }
 
-        const res = await axios.get('/api/mypage/info');
+        const res = await axios.get('/api/mypage/info', {
+            headers: { Authorization: `Bearer ${token}` }
+        });
         
         if (res.status === 200) {
             setUserInfo(res.data.user);
@@ -182,7 +185,6 @@ function MyPage() {
                 stocks: res.data.stocks || [], 
                 news: res.data.news || [] 
             });
-            // 수정 폼 초기값 설정
             setEditForm({ fullName: res.data.user.fullName });
         }
 
@@ -195,7 +197,7 @@ function MyPage() {
     fetchData();
   }, [navigate]);
 
-  // 2. 정보 수정 핸들러 (이름 수정 + 로컬 스토리지 갱신)
+  // 2. 정보 수정
   const handleUpdate = async () => {
     if (!editForm.fullName.trim()) {
         alert("이름을 입력해주세요.");
@@ -205,18 +207,17 @@ function MyPage() {
     if (!window.confirm("정보를 수정하시겠습니까?")) return;
     
     try {
-        // 백엔드 DB 업데이트
-        await axios.put('/api/mypage/update', editForm);
+        const token = localStorage.getItem('accessToken');
+        await axios.put('/api/mypage/update', editForm, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
 
-        // ⭐ [핵심 추가] 내 브라우저의 명찰(localStorage)도 새 이름으로 바꿔주기
         const currentUser = JSON.parse(localStorage.getItem('user'));
         const newUserInfo = { ...currentUser, fullName: editForm.fullName };
         localStorage.setItem('user', JSON.stringify(newUserInfo));
 
         alert("정보가 수정되었습니다.");
         setIsEditing(false);
-        
-        // 화면 새로고침 (이제 Header가 바뀐 localStorage를 읽어올 겁니다)
         window.location.reload(); 
     } catch (e) {
         console.error(e);
@@ -224,15 +225,16 @@ function MyPage() {
     }
   };
 
-  // 3. 회원 탈퇴 핸들러
+  // 3. 회원 탈퇴
   const handleWithdraw = async () => {
     if (window.confirm("정말로 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다.")) {
         try {
-            await axios.delete('/api/mypage/withdraw');
+            const token = localStorage.getItem('accessToken');
+            await axios.delete('/api/mypage/withdraw', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             
-            // 로컬 스토리지 비우기
             localStorage.clear();
-            
             alert("탈퇴가 완료되었습니다.");
             navigate('/');
             window.location.reload();
@@ -246,9 +248,17 @@ function MyPage() {
   const handleDeleteStock = async (stockCode) => {
     if (!window.confirm("삭제하시겠습니까?")) return;
     try {
-      await axios.delete(`/api/mypage/favorites/stock/${stockCode}`);
+      const token = localStorage.getItem('accessToken');
+      await axios.delete(`/api/mypage/favorites/stock/${stockCode}`, {
+          headers: { Authorization: `Bearer ${token}` }
+      });
       alert("삭제되었습니다.");
-      window.location.reload(); 
+      
+      // 화면 갱신 (새로고침 없이)
+      setFavorites(prev => ({
+          ...prev,
+          stocks: prev.stocks.filter(s => s.stockCode !== stockCode)
+      }));
     } catch (e) {
       alert("삭제 실패");
     }
@@ -258,11 +268,46 @@ function MyPage() {
   const handleDeleteNews = async (newsId) => {
     if (!window.confirm("삭제하시겠습니까?")) return;
     try {
-      await axios.delete(`/api/mypage/favorites/news/${newsId}`);
+      const token = localStorage.getItem('accessToken');
+      await axios.delete(`/api/mypage/favorites/news/${newsId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+      });
       alert("삭제되었습니다.");
-      window.location.reload();
+      
+      // 화면 갱신 (새로고침 없이)
+      setFavorites(prev => ({
+          ...prev,
+          news: prev.news.filter(n => n.newsId !== newsId)
+      }));
     } catch (e) {
       alert("삭제 실패");
+    }
+  };
+
+  // ⭐ [추가됨] 뉴스 읽음 처리 핸들러
+  const handleNewsClick = async (newsId, url) => {
+    // 1. 새 탭으로 뉴스 열기
+    window.open(url, '_blank', 'noopener,noreferrer');
+
+    // 2. 서버에 '읽음' 신호 보내기
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+        try {
+            await axios.post('/api/mypage/favorites/news/read', 
+                { newsId: newsId },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            // 3. 화면 상태 즉시 업데이트 (회색으로 변경)
+            setFavorites(prev => ({
+                ...prev,
+                news: prev.news.map(n => 
+                    n.newsId === newsId ? { ...n, isRead: 'Y' } : n
+                )
+            }));
+        } catch (e) {
+            console.error("읽음 처리 실패", e);
+        }
     }
   };
 
@@ -355,15 +400,34 @@ function MyPage() {
       {activeTab === 'NEWS' && (
           <div style={styles.card}>
               {favorites.news.length === 0 ? <p style={{color:'#888'}}>스크랩한 뉴스가 없습니다.</p> : 
-                favorites.news.map((news, idx) => (
-                    <div key={idx} style={styles.listItem}>
-                        <div style={{flex:1}}>
-                            <a href={news.newsUrl} target="_blank" rel="noopener noreferrer" style={styles.newsTitle}>{news.newsTitle}</a>
-                            <div style={styles.newsDate}>{news.newsDate}</div>
+                favorites.news.map((news, idx) => {
+                    // ⭐ 읽음 여부에 따른 색상 처리
+                    const isRead = news.isRead === 'Y';
+                    
+                    return (
+                        <div key={idx} style={styles.listItem}>
+                            <div style={{flex:1}}>
+                                {/* ⭐ a 태그 대신 onClick으로 동작 처리 */}
+                                <a 
+                                    href={news.newsUrl} 
+                                    onClick={(e) => {
+                                        e.preventDefault(); // 기본 이동 막음
+                                        handleNewsClick(news.newsId, news.newsUrl);
+                                    }}
+                                    style={{
+                                        ...styles.newsTitle,
+                                        color: isRead ? '#bbb' : '#333', // 읽었으면 회색, 아니면 검정
+                                        textDecoration: isRead ? 'line-through' : 'none' // (선택) 읽으면 취소선
+                                    }}
+                                >
+                                    {news.newsTitle}
+                                </a>
+                                <div style={styles.newsDate}>{news.newsDate}</div>
+                            </div>
+                            <button style={styles.btnDelete} onClick={() => handleDeleteNews(news.newsId)}>삭제</button>
                         </div>
-                        <button style={styles.btnDelete} onClick={() => handleDeleteNews(news.newsId)}>삭제</button>
-                    </div>
-                ))
+                    );
+                })
               }
           </div>
       )}

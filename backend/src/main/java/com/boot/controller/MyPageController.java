@@ -123,4 +123,17 @@ public class MyPageController {
         userDAO.removeFavoriteNews(user.getUsername(), newsId);
         return ResponseEntity.ok("스크랩을 취소했습니다.");
     }
+    
+    // 뉴스 읽음 처리
+    @PostMapping("/favorites/news/read")
+    public ResponseEntity<?> markNewsAsRead(@RequestBody Map<String, Long> req, 
+                                            @AuthenticationPrincipal UserDetails user) {
+        try {
+            // DAO 메서드 호출 (newsId를 받아서 처리)
+            userDAO.markNewsAsRead(user.getUsername(), req.get("newsId"));
+            return ResponseEntity.ok("읽음 처리되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("오류 발생");
+        }
+    }
 }

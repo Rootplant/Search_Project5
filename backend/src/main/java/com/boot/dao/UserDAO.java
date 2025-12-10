@@ -99,4 +99,6 @@ public interface UserDAO {
     List<FavoriteDTO> getFavoriteNews(@Param("email") String email);
     
     void clearSuspend(String email);
+    
+    void markNewsAsRead(@Param("email") String email, @Param("newsId") Long newsId);
 }
