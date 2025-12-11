@@ -383,9 +383,9 @@ function IndustryDetailPage() {
                 );
              })}
             
-            <div style={{marginTop:'15px', textAlign:'center'}}>
+            {/* <div style={{marginTop:'15px', textAlign:'center'}}>
               <a href="#" style={{fontSize:'0.9rem', color:'#666', textDecoration:'underline'}}>뉴스 더보기</a>
-            </div>
+            </div> */}
           </div>
         </aside>
 
