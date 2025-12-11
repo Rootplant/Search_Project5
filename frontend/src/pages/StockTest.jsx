@@ -16,31 +16,24 @@ export default function StockTest() {
   useEffect(() => {
     if (!code) return;
 
-    // ✅ Spring → Python 구독 요청
-    fetch(`http://localhost:8484/api/stocks/subscribe/${code}`, { method: "POST" })
-      .then(() => console.log("✅ Spring 구독 요청 전송 완료:", code))
-      .catch((err) => console.error("❌ Spring 구독 요청 실패:", err));
+    // 구독 요청
+    fetch(`http://localhost:5000/subscribe`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code })
+    }).then(() => console.log("✅ Flask 구독 요청:", code));
 
-    // ✅ STOMP WebSocket 연결
+    // STOMP 연결
     const client = new Client({
       webSocketFactory: () => new SockJS("http://localhost:8484/ws-stock"),
       reconnectDelay: 5000,
-      debug: (str) => console.log(str),
     });
 
     client.onConnect = () => {
-      console.log("✅ STOMP 연결 성공");
-
-      // ✅ 기존 구독 해제
-      if (subscriptionRef.current) subscriptionRef.current.unsubscribe();
-
-      // ✅ 현재 종목 새로 구독
       subscriptionRef.current = client.subscribe(
         `/topic/stock/${code}`,
-        (message) => {
-          const data = JSON.parse(message.body);
-          console.log("📥 수신 데이터:", data);
-
+        (msg) => {
+          const data = JSON.parse(msg.body);
           setCurrentPrice(data.currentPrice);
           setPriceChange(data.priceChange);
           setChangeRate(data.changeRate);
@@ -48,26 +41,25 @@ export default function StockTest() {
       );
     };
 
-    client.onStompError = (frame) => console.error("❌ STOMP 에러:", frame);
-
     client.activate();
     stompClientRef.current = client;
 
-    // ✅ cleanup (컴포넌트 언마운트 시)
+    // 창 종료 시 구독 해제
+    const handleBeforeUnload = () => {
+      if (subscriptionRef.current) subscriptionRef.current.unsubscribe();
+      if (stompClientRef.current) stompClientRef.current.deactivate();
+
+      // sendBeacon 문자열 그대로 전송
+      const url = "http://localhost:5000/unsubscribe";
+      const data = JSON.stringify({ code });
+      navigator.sendBeacon(url, data);
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
     return () => {
-      console.log("🛑 STOMP 연결 해제 + Python 구독 해제:", code);
-
-      if (subscriptionRef.current) {
-        subscriptionRef.current.unsubscribe();
-        subscriptionRef.current = null;
-      }
-
-      if (stompClientRef.current) {
-        stompClientRef.current.deactivate();
-        stompClientRef.current = null;
-      }
-
-      fetch(`http://localhost:8484/api/stocks/unsubscribe/${code}`, { method: "POST" }).catch(() => {});
+      handleBeforeUnload();
+      window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, [code]);
 

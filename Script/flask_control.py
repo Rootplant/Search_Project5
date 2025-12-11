@@ -11,6 +11,17 @@ def subscribe():
     print("✅ 종목 변경됨:", current_stock_code)
     return "OK"
 
+@app.route("/unsubscribe", methods=["POST"])
+def unsubscribe():
+    global current_stock_code
+    data = request.json
+    code = data.get("code")
+    if code and code == current_stock_code:
+        print("🧹 구독 해제됨:", current_stock_code)
+        current_stock_code = None
+    return "OK"
+
+
 def get_current_code():
     return current_stock_code
 
