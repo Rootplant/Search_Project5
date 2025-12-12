@@ -59,6 +59,13 @@ public class StockNewsController {
         return stockNewsService.getAllStockSentimentSummaryWithPeriod(days);
     }
 
+    @GetMapping("/sentiment/dashboard")
+    public List<Map<String, Object>> getDashboardSentimentSummary(
+            @RequestParam(defaultValue = "30") int days) {
+
+        return stockNewsService.getAllStockSentimentSummaryWithPeriod(days);
+    }
+
     // 종목별 날짜별 감성 통계 (트렌드)
     @GetMapping("/{stockCode}/sentiment/trend")
     public List<Map<String, Object>> getSentimentTrend(
@@ -110,4 +117,67 @@ public class StockNewsController {
         return stockNewsService.getStocksByKeyword(keyword);
     }
 
+    // ================================
+    // 🔥 인기 종목 Top 10 (기사 수 기준)
+    // ================================
+    @GetMapping("/top10")
+    public List<Map<String, Object>> getTop10PopularStocks() {
+        return stockNewsService.getTop10PopularStocks();
+    }
+
+
+
+    // =====================================================================
+    // 11) 🔥🔥 AI 인사이트 생성 API (대시보드용 자동 분석)
+    //     예: /api/news/insights?days=30
+    // =====================================================================
+    @GetMapping("/insights")
+    public List<String> getAiInsights(@RequestParam(defaultValue = "30") int days) {
+
+        // 기간 필터링된 감성 요약 목록 가져오기
+        List<Map<String, Object>> list =
+                stockNewsService.getAllStockSentimentSummaryWithPeriod(days);
+
+        if (list == null || list.isEmpty()) {
+            return List.of("데이터 없음");
+        }
+
+        String bestPositiveName = "";
+        double bestPositiveValue = -1;
+
+        String bestNegativeName = "";
+        double bestNegativeValue = -1;
+
+        for (Map<String, Object> row : list) {
+
+            // 🔥 실제 SQL alias 그대로 사용해야 함!
+            String name = String.valueOf(row.get("STOCK_NAME"));
+
+            double positive = 0;
+            if (row.get("POSITIVERATIO") != null) {
+                positive = Double.parseDouble(row.get("POSITIVERATIO").toString());
+            }
+
+            double negative = 0;
+            if (row.get("NEGATIVERATIO") != null) {
+                negative = Double.parseDouble(row.get("NEGATIVERATIO").toString());
+            }
+
+            if (positive > bestPositiveValue) {
+                bestPositiveValue = positive;
+                bestPositiveName = name;
+            }
+
+            if (negative > bestNegativeValue) {
+                bestNegativeValue = negative;
+                bestNegativeName = name;
+            }
+        }
+
+        return List.of(
+                "이번 기간 가장 긍정적인 종목은 " + bestPositiveName + "입니다.",
+                "부정 증가 종목은 " + bestNegativeName + "입니다."
+        );
+    }
+    
 }

@@ -49,4 +49,6 @@ public interface StockNewsService {
     // ✅ 키워드별 종목 조회
     List<Map<String, Object>> getStocksByKeyword(String keyword);
 
+    List<Map<String, Object>> getTop10PopularStocks();
+
 }

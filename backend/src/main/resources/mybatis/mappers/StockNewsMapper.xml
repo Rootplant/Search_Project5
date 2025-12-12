@@ -192,4 +192,23 @@
         ORDER BY newsCount DESC, s.STOCK_NAME
     </select>
 
+	<!-- 🔥 인기 종목 Top10 (기사 수 기준) -->
+    <select id="getTop10PopularStocks" resultType="map">
+        <![CDATA[
+        SELECT *
+        FROM (
+            SELECT 
+                N.STOCK_CODE,
+                I.STOCK_NAME,
+                COUNT(*) AS ARTICLE_COUNT
+            FROM STOCK_NEWS N
+            JOIN STOCK_INFO I 
+                ON N.STOCK_CODE = I.STOCK_CODE
+            GROUP BY N.STOCK_CODE, I.STOCK_NAME
+            ORDER BY COUNT(*) DESC
+        )
+        WHERE ROWNUM <= 10
+    ]]>
+    
+    </select>
 </mapper>
