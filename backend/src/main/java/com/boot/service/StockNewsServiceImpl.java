@@ -271,22 +271,7 @@ public class StockNewsServiceImpl implements StockNewsService {
         return stockNewsDAO.getOverallSentimentSummary();
     }
 
-    // 안전한 숫자 변환 함수
-    private int getNumber(Object val) {
-        if (val == null) return 0;
-        if (val instanceof Number) {
-            return ((Number) val).intValue();
-        }
-        return 0;
-    }
 
-    private double getDouble(Object val) {
-        if (val == null) return 0.0;
-        if (val instanceof Number) {
-            return ((Number) val).doubleValue();
-        }
-        return 0.0;
-    }
     
     @Override
     public List<String> getIndustries() {
@@ -308,32 +293,10 @@ public class StockNewsServiceImpl implements StockNewsService {
         return stockNewsDAO.getStocksByKeyword(keyword);
     }
 
+
     
-    // ===========================================================
-    // 8) 종목별 키워드 TOP10
-    // ===========================================================
-    @Override
-    public List<Map<String, Object>> getTopKeywordsByStock(String stockCode) {
-        List<Map<String, Object>> keywordRows = stockNewsDAO.getTopKeywordsByStock(stockCode);
-        return extractTopKeywords(keywordRows, 10);
-    }
 
-    // ===========================================================
-    // 9) 전체 뉴스 기준 키워드 TOP20
-    // ===========================================================
-    @Override
-    public List<Map<String, Object>> getTopKeywordsAll(int days) {
-        List<Map<String, Object>> keywordRows = stockNewsDAO.getTopKeywordsAll(days);
-        return extractTopKeywords(keywordRows, 20);
-    }
-
-    // ===========================================================
-    // 10) 전체 감성 통계 (기사 전체 기준)
-    // ===========================================================
-    @Override
-    public Map<String, Object> getOverallSentimentSummary() {
-        return stockNewsDAO.getOverallSentimentSummary();
-    }
+    
 
     // ===========================================================
     // 🔧 공통 유틸리티 - 키워드 집계
