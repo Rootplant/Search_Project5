@@ -16,7 +16,7 @@ except Exception:
 FLASK_PORT = 5000
 SPRING_URL = "http://localhost:8484/api/stocks/realtime" # 데이터를 전송할 Spring Boot 서버 URL
 WS_URL = "ws://ops.koreainvestment.com:31000" # 한국투자증권 실시간 웹소켓 URL
-MAX_SUBS = 20
+MAX_SUBS = 30
 
 # ------------------------
 # 상태 관리 (모든 스레드에서 접근)
