@@ -236,5 +236,38 @@
             SYSDATE
         )
     </insert>
-
-</mapper>
+    
+	<select id="countLockedUsers" resultType="int">
+	    SELECT COUNT(*)
+	    FROM USER_INFO
+	    WHERE LOCK_UNTIL IS NOT NULL
+	      AND LOCK_UNTIL > SYSDATE
+	</select>
+	
+	<select id="countRapidFailAttempts" resultType="int">
+	    SELECT COUNT(*)
+	    FROM (
+	        SELECT EMAIL
+	        FROM LOGIN_LOG
+	        WHERE STATUS = 'FAIL'
+	          AND CREATED_AT >= SYSDATE - (10/1440)  -- 최근 10분
+	        GROUP BY EMAIL
+	        <![CDATA[
+	        HAVING COUNT(*) >= 3
+	        ]]>
+	    )
+	</select>
+	
+	<select id="countRiskyIp" resultType="int">
+	    SELECT COUNT(*)
+	    FROM (
+	        SELECT IP_ADDRESS
+	        FROM LOGIN_LOG
+	        WHERE STATUS = 'FAIL'
+	        GROUP BY IP_ADDRESS
+	        <![CDATA[
+	        HAVING COUNT(*) >= 5
+	        ]]>
+	    )
+	</select>
+	</mapper>

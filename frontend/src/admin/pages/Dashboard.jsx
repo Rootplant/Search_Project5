@@ -7,34 +7,31 @@ import {
   Col,
   List,
   Tag,
-  Table,
-  Badge,
   Space,
 } from "antd";
-import {
-  Line,
-  Pie,
-  Bar,
-} from "@ant-design/plots";
+
+import { Line, Pie, Bar } from "@ant-design/plots";
+
 import {
   UserOutlined,
   CheckCircleOutlined,
   StopOutlined,
-  ExclamationCircleOutlined,
   MailOutlined,
   FileTextOutlined,
-  ThunderboltOutlined,
 } from "@ant-design/icons";
+
 import adminApi from "../api/adminApi";
 
+// ======================================================
+// 메인 Dashboard 컴포넌트
+// ======================================================
 export default function Dashboard() {
   const [data, setData] = useState(null);
   const [adminLogs, setAdminLogs] = useState([]);
-  const [realtimeData, setRealtimeData] = useState([]);
 
-  // ------------------------------------------------------------------
-  // 1) 대시보드 + 관리자 로그 동시 로드
-  // ------------------------------------------------------------------
+  // ---------------------------------------------------------
+  // 데이터 로드
+  // ---------------------------------------------------------
   useEffect(() => {
     const loadAll = async () => {
       try {
@@ -43,69 +40,13 @@ export default function Dashboard() {
           adminApi.getAdminLog(),
         ]);
 
-        const d = dashRes.data || {};
-        setData(d);
-
-        const logList = (logRes.data || []).slice(0, 5);
-        setAdminLogs(logList);
-
-        // 실시간 그래프 초기값
-        const initActive = d.summary?.activeUsers ?? 0;
-        const now = new Date();
-        setRealtimeData([
-          {
-            time: now.toLocaleTimeString(),
-            activeUsers: initActive,
-          },
-        ]);
-      } catch (e) {
-        console.error(e);
+        setData(dashRes.data || {});
+        setAdminLogs((logRes.data || []).slice(0, 5));
+      } catch (err) {
+        console.error(err);
       }
     };
-
     loadAll();
-  }, []);
-
-  // ------------------------------------------------------------------
-  // 2) 실시간 접속자 WebSocket / 폴백 (간단 예시)
-  // ------------------------------------------------------------------
-  useEffect(() => {
-    // 백엔드에서 WebSocket 구현했다면 이 부분 URI만 바꿔서 사용
-    let socket = null;
-    let interval = null;
-
-    try {
-      // 예시: ws://localhost:8080/ws/admin/active-users
-      // 서버에서 { time: "HH:mm:ss", activeUsers: 123 } 형태로 push 해줄 때
-      // socket = new WebSocket("ws://localhost:8080/ws/admin/active-users");
-      //
-      // socket.onmessage = (event) => {
-      //   const msg = JSON.parse(event.data);
-      //   setRealtimeData((prev) => [...prev.slice(-19), msg]); // 최근 20개만 유지
-      // };
-
-      // 🔁 지금은 서버 구현 전이라고 가정하고, 임시 시뮬레이션만 돌림
-      interval = setInterval(() => {
-        setRealtimeData((prev) => {
-          const last = prev[prev.length - 1];
-          const base = last?.activeUsers ?? 100;
-          const next = Math.max(0, base + (Math.random() * 10 - 5)); // +-5 변동
-          const now = new Date();
-          const point = {
-            time: now.toLocaleTimeString(),
-            activeUsers: Math.round(next),
-          };
-          return [...prev.slice(-19), point];
-        });
-      }, 5000);
-    } catch (e) {
-      console.error(e);
-    }
-
-    return () => {
-      if (socket) socket.close();
-      if (interval) clearInterval(interval);
-    };
   }, []);
 
   if (!data) return <div style={{ padding: 24 }}>Loading...</div>;
@@ -115,31 +56,29 @@ export default function Dashboard() {
     dailyJoins = [],
     loginStats = [],
     topNewsStocks = [],
-    riskyUsers = [],
-    failedLoginTop10 = [],
-    todayNewsSummary = {},
+    securityStats = {}, // 🔥 보안 통계 데이터
   } = data;
 
-  // ------------------------------------------------------------------
-  // Summary 카드
-  // ------------------------------------------------------------------
+  // ======================================================
+  // Summary 카드 구성
+  // ======================================================
   const summaryCards = [
     {
       title: "총 사용자",
       value: summary.totalUsers,
-      color: "#3b82f6",
+      color: "#2563eb",
       icon: <UserOutlined style={{ fontSize: 20 }} />,
     },
     {
       title: "활성 사용자",
       value: summary.activeUsers,
-      color: "#10b981",
+      color: "#16a34a",
       icon: <CheckCircleOutlined style={{ fontSize: 20 }} />,
     },
     {
       title: "정지 사용자",
       value: summary.suspendedUsers,
-      color: "#ef4444",
+      color: "#dc2626",
       icon: <StopOutlined style={{ fontSize: 20 }} />,
     },
     {
@@ -149,39 +88,35 @@ export default function Dashboard() {
       icon: <MailOutlined style={{ fontSize: 20 }} />,
     },
     {
-      title: "위험 사용자",
-      value: summary.dangerUsers,
-      color: "#dc2626",
-      icon: <ExclamationCircleOutlined style={{ fontSize: 20 }} />,
+      title: "등록된 종목 수",
+      value: summary.totalStocks,
+      color: "#7c3aed",
+      icon: <FileTextOutlined style={{ fontSize: 20 }} />,
     },
     {
-      title: "뉴스 수",
+      title: "전체 뉴스 수",
       value: summary.totalNews,
       color: "#6366f1",
       icon: <FileTextOutlined style={{ fontSize: 20 }} />,
     },
   ];
 
-  // ------------------------------------------------------------------
-  // Line Chart (최근 7일 가입자)
-  // ------------------------------------------------------------------
+  // ======================================================
+  // 차트 설정
+  // ======================================================
+
+  // 최근 가입자 그래프
   const lineConfig = {
     data: dailyJoins,
     xField: "joinDate",
     yField: "count",
     smooth: true,
-    height: 250,
-    autoFit: true,
-    point: { size: 4, shape: "circle" },
-    areaStyle: () => ({
-      fill: "l(270) 0:#3b82f6 1:#93c5fd",
-      fillOpacity: 0.4,
-    }),
+    height: 260,
+    point: { size: 4 },
+    areaStyle: { fill: "rgba(37,99,235,0.25)" },
   };
 
-  // ------------------------------------------------------------------
-  // Pie Chart (로그인 성공/실패)
-  // ------------------------------------------------------------------
+  // 로그인 성공/실패 비율
   const pieConfig = {
     data: loginStats,
     angleField: "count",
@@ -190,62 +125,22 @@ export default function Dashboard() {
     innerRadius: 0.6,
     label: {
       type: "inner",
-      offset: "-30%",
       content: "{count}",
-      style: { fontSize: 14 },
+      style: { fontSize: 14, fontWeight: "bold" },
     },
-    interactions: [{ type: "element-active" }],
   };
 
-  // ------------------------------------------------------------------
-  // Bar Chart (뉴스 많은 종목 Top 5)
-  // ------------------------------------------------------------------
-  const barNewsConfig = {
+  // 뉴스 많은 종목 TOP 5
+  const barConfig = {
     data: topNewsStocks,
     xField: "newsCount",
     yField: "stockName",
     height: 300,
-    label: { position: "right", style: { fill: "#000" } },
+    label: { position: "right" },
     barStyle: { fill: "#6366f1" },
   };
 
-  // ------------------------------------------------------------------
-  // 실시간 접속자 그래프
-  // ------------------------------------------------------------------
-  const realtimeConfig = {
-    data: realtimeData,
-    xField: "time",
-    yField: "activeUsers",
-    height: 220,
-    autoFit: true,
-    smooth: true,
-    point: { size: 3, shape: "circle" },
-    areaStyle: () => ({
-      fill: "l(270) 0:#22c55e 1:#bbf7d0",
-      fillOpacity: 0.4,
-    }),
-  };
-
-  // ------------------------------------------------------------------
-  // 실패 로그인 Top 10 테이블
-  // ------------------------------------------------------------------
-  const failedColumns = [
-    { title: "Email", dataIndex: "email", key: "email" },
-    {
-      title: "실패 횟수",
-      dataIndex: "failCount",
-      key: "failCount",
-      width: 80,
-    },
-    {
-      title: "마지막 실패 시간",
-      dataIndex: "lastFailedAt",
-      key: "lastFailedAt",
-      width: 160,
-    },
-  ];
-
-  // 관리자 로그 액션 텍스트 간단 매핑 (자세한 건 AdminActionLogs 쪽에서)
+  // 관리자 로그 Action 매핑
   const actionLabel = (action) => {
     switch (action) {
       case "CLEAR_TOKENS":
@@ -263,89 +158,147 @@ export default function Dashboard() {
       case "FORCE_LOGOUT":
         return "강제 로그아웃";
       default:
-        return action || "기타";
+        return action || "기타 작업";
     }
   };
 
+  // ======================================================
+  // UI 출력
+  // ======================================================
+
   return (
     <div style={{ padding: 24 }}>
-      <h2 style={{ marginBottom: 20 }}>관리자 대시보드</h2>
+      <h2 style={{ marginBottom: 20, fontWeight: 700 }}>📊 관리자 대시보드</h2>
 
-      {/* ========================= */}
-      {/* 1. Summary 영역 */}
-      {/* ========================= */}
+      {/* --------------------------------------- */}
+      {/* 1. Summary 카드 */}
+      {/* --------------------------------------- */}
       <Row gutter={[16, 16]}>
-        {summaryCards.map((card, i) => (
-          <Col xs={24} sm={12} md={8} lg={8} xl={4} key={i}>
+        {summaryCards.map((card, idx) => (
+          <Col xs={24} sm={12} md={8} lg={8} xl={4} key={idx}>
             <Card
               style={{
                 background: card.color,
                 color: "white",
-                borderRadius: 10,
-                boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                borderRadius: 12,
+                minHeight: 120,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                padding: 12,
               }}
             >
-              <div style={{ fontSize: 15, fontWeight: 500 }}>{card.title}</div>
-              <div style={{ fontSize: 26, fontWeight: "bold" }}>
-                {card.value}
-              </div>
-              <div style={{ marginTop: 10 }}>{card.icon}</div>
+              <div style={{ fontSize: 16 }}>{card.title}</div>
+              <div style={{ fontSize: 30, fontWeight: "bold" }}>{card.value}</div>
+              <div>{card.icon}</div>
             </Card>
           </Col>
         ))}
       </Row>
 
-      {/* ========================= */}
-      {/* 2. 가입자 / 실시간 접속 */}
-      {/* ========================= */}
+      {/* --------------------------------------- */}
+      {/* 🔐 2. 보안 통계(Security Overview) */}
+      {/* --------------------------------------- */}
+      <div style={{ marginTop: 40 }}>
+        <h3 style={{ fontWeight: 700, marginBottom: 16 }}>🔐 보안 통계 (Security Overview)</h3>
+
+        <Card style={{ borderRadius: 10 }}>
+          <Row gutter={16}>
+            <Col xs={24} md={8}>
+              <div style={{ padding: 12 }}>
+                <h4 style={{ marginBottom: 4 }}>🚨 위험 IP 탐지</h4>
+                <div style={{ fontSize: 28, fontWeight: "bold", color: "#dc2626" }}>
+                  {securityStats.riskyIpCount ?? 0}
+                </div>
+                <div style={{ fontSize: 12, color: "#666" }}>최근 24시간 기준</div>
+              </div>
+            </Col>
+
+            <Col xs={24} md={8}>
+              <div style={{ padding: 12 }}>
+                <h4 style={{ marginBottom: 4 }}>⚠ Rapid Fail 탐지</h4>
+                <div style={{ fontSize: 28, fontWeight: "bold", color: "#f59e0b" }}>
+                  {securityStats.rapidFailAttempts ?? 0}
+                </div>
+                <div style={{ fontSize: 12, color: "#666" }}>짧은 시간 내 연속 실패</div>
+              </div>
+            </Col>
+
+            <Col xs={24} md={8}>
+              <div style={{ padding: 12 }}>
+                <h4 style={{ marginBottom: 4 }}>🔒 잠금된 계정</h4>
+                <div style={{ fontSize: 28, fontWeight: "bold", color: "#2563eb" }}>
+                  {securityStats.lockedUsers ?? 0}
+                </div>
+                <div style={{ fontSize: 12, color: "#666" }}>비밀번호 실패로 자동 잠금</div>
+              </div>
+            </Col>
+          </Row>
+
+          {/* 상세 보기 */}
+          <div style={{ marginTop: 20, textAlign: "right" }}>
+            <a
+              href="/admin/logs/login"
+              style={{
+                fontSize: 14,
+                color: "#2563eb",
+                textDecoration: "underline",
+                cursor: "pointer",
+              }}
+            >
+              🔎 보안 이벤트 상세 보기 →
+            </a>
+          </div>
+        </Card>
+      </div>
+
+      {/* --------------------------------------- */}
+      {/* 3. 가입자 / 로그인 비율 */}
+      {/* --------------------------------------- */}
       <Row gutter={16} style={{ marginTop: 30 }}>
-        <Col xs={24} lg={16}>
-          <Card title="최근 7일 가입자 수">
+        <Col xs={24} lg={12}>
+          <Card title="📈 최근 7일 가입자 수">
             <Line {...lineConfig} />
           </Card>
         </Col>
 
-      </Row>
-
-      {/* ========================= */}
-      {/* 3. 로그인 / 실패 Top10 */}
-      {/* ========================= */}
-      <Row gutter={16} style={{ marginTop: 30 }}>
-        <Col xs={24} lg={8}>
-          <Card title="로그인 성공/실패 비율">
+        <Col xs={24} lg={12}>
+          <Card title="🔑 로그인 성공/실패 비율">
             <Pie {...pieConfig} />
           </Card>
         </Col>
       </Row>
 
-      {/* ========================= */}
-      {/* 4. 위험 사용자 / 관리자 로그 */}
-      {/* ========================= */}
+      {/* --------------------------------------- */}
+      {/* 4. 뉴스 TOP 5 + 관리자 로그 */}
+      {/* --------------------------------------- */}
       <Row gutter={16} style={{ marginTop: 30 }}>
+        <Col xs={24} lg={12}>
+          <Card title="📰 뉴스 많은 종목 Top 5">
+            <Bar {...barConfig} />
+          </Card>
+        </Col>
 
         <Col xs={24} lg={12}>
-          <Card title="최근 관리자 작업 로그 (5건)">
+          <Card title="🛠 최근 관리자 작업 로그 (5건)">
             <List
               dataSource={adminLogs}
-              locale={{ emptyText: "관리자 작업 로그가 없습니다." }}
               renderItem={(log) => (
                 <List.Item>
                   <List.Item.Meta
                     title={
                       <Space>
-                        <Tag>{actionLabel(log.ACTION || log.action)}</Tag>
-                        <span>{log.ADMIN_EMAIL || log.adminEmail}</span>
+                        <Tag color="blue">
+                          {actionLabel(log.action || log.ACTION)}
+                        </Tag>
+                        <span>{log.adminEmail || log.ADMIN_EMAIL}</span>
                       </Space>
                     }
                     description={
                       <>
-                        <div>시간: {log.CREATED_AT || log.createdAt}</div>
-                        <div>
-                          대상: {log.TARGET_EMAIL || log.targetEmail || "-"}
-                        </div>
-                        <div style={{ whiteSpace: "pre-line" }}>
-                          {log.DETAIL || log.detail}
-                        </div>
+                        <div>시간: {log.createdAt || log.CREATED_AT}</div>
+                        <div>대상: {log.targetEmail || log.TARGET_EMAIL}</div>
+                        <div style={{ whiteSpace: "pre-line" }}>{log.detail}</div>
                       </>
                     }
                   />
@@ -354,18 +307,6 @@ export default function Dashboard() {
             />
           </Card>
         </Col>
-      </Row>
-
-      {/* ========================= */}
-      {/* 5. 뉴스 Top5 + 오늘의 뉴스 요약 */}
-      {/* ========================= */}
-      <Row gutter={16} style={{ marginTop: 30, marginBottom: 30 }}>
-        <Col xs={24} lg={12}>
-          <Card title="뉴스 많은 종목 Top 5">
-            <Bar {...barNewsConfig} />
-          </Card>
-        </Col>
-
       </Row>
     </div>
   );

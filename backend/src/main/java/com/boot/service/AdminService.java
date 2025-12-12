@@ -7,6 +7,7 @@ import com.boot.dto.ChangeRoleDTO;
 import com.boot.dto.DailyUserJoinDTO;
 import com.boot.dto.DashboardSummaryDTO;
 import com.boot.dto.LoginStatusStatDTO;
+import com.boot.dto.SecurityStatsDTO;
 import com.boot.dto.StockNewsTopDTO;
 import com.boot.dto.SuspendRequestDTO;
 
@@ -244,12 +245,20 @@ public class AdminService {
         List<LoginStatusStatDTO> loginStats = adminDAO.getLoginStatusStats(days);
         List<StockNewsTopDTO> topNewsStocks = adminDAO.getTopNewsStocks(days, newsLimit);
 
+        
+        // 보안 통계 로드
+        SecurityStatsDTO sec = new SecurityStatsDTO();
+        sec.setLockedUsers(adminDAO.countLockedUsers());
+        sec.setRapidFailAttempts(adminDAO.countRapidFailAttempts());
+        sec.setRiskyIpCount(adminDAO.countRiskyIp());
+        
         AdminDashboardDTO dto = new AdminDashboardDTO();
         dto.setSummary(summary);
         dto.setDailyJoins(dailyJoins);
         dto.setLoginStats(loginStats);
         dto.setTopNewsStocks(topNewsStocks);
-
+        dto.setSecurityStats(sec);
+        
         return ResponseEntity.ok(dto);
     }
 }

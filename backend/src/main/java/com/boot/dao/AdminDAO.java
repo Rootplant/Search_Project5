@@ -65,6 +65,10 @@ public interface AdminDAO {
     // 최근 N일 뉴스 많이 나온 종목 TOP N
     List<StockNewsTopDTO> getTopNewsStocks(@Param("days") int days,
                                            @Param("limit") int limit);
+    // 보안 통계
+    int countLockedUsers();
+    int countRapidFailAttempts();
+    int countRiskyIp();
     
     void insertAdminLog(@Param("adminEmail") String adminEmail,
 			            @Param("targetEmail") String targetEmail,
