@@ -67,13 +67,25 @@ const styles = {
     borderRadius: '8px',
     overflow: 'hidden',
   },
-  newsItem: {
-    display: 'block',
-    textDecoration: 'none',
+  // ⭐ [수정] 뉴스 아이템 래퍼 (Flex 적용)
+  newsItemWrapper: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
     padding: '15px',
     borderBottom: '1px solid #eee',
     backgroundColor: 'white',
     transition: 'background-color 0.2s',
+  },
+  // ⭐ [추가] 뉴스 텍스트 영역
+  newsContent: {
+    flex: 1,
+    paddingRight: '15px',
+  },
+  newsLink: {
+    textDecoration: 'none',
+    display: 'block',
+    cursor: 'pointer',
   },
   newsTitle: {
     fontSize: '16px',
@@ -85,8 +97,7 @@ const styles = {
   newsMeta: {
     fontSize: '12px',
     color: '#999',
-    display: 'flex',
-    justifyContent: 'space-between',
+    marginTop: '5px',
   },
   emptyMsg: {
     color: '#999',
@@ -100,7 +111,6 @@ const styles = {
     color: 'inherit',
     display: 'block',
   },
-  // ⭐ [추가] 페이지네이션 스타일
   pagination: {
     display: 'flex',
     justifyContent: 'center',
@@ -118,6 +128,20 @@ const styles = {
     fontWeight: isActive ? 'bold' : 'normal',
     transition: 'all 0.2s',
   }),
+  // ⭐ [추가] 별표 버튼 스타일
+  newsStarButton: {
+    background: 'none',
+    border: 'none',
+    fontSize: '24px',
+    cursor: 'pointer',
+    color: '#ccc',
+    padding: '0 5px',
+    transition: 'color 0.2s',
+    marginTop: '2px', // 제목 높이 보정
+  },
+  newsStarActive: {
+    color: '#FFD700',
+  },
 };
 
 function SearchResultPage() {
@@ -128,22 +152,56 @@ function SearchResultPage() {
   const [newsList, setNewsList] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // ⭐ [추가] 페이지네이션 상태
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5; // 한 페이지당 보여줄 개수 (5개씩)
+  // ⭐ [추가] 찜한 뉴스 ID 저장용 State
+  const [savedBookmarks, setSavedBookmarks] = useState([]);
 
-  // 검색어가 바뀌면 페이지를 1로 초기화
+  // 페이지네이션 상태
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
   useEffect(() => {
     setCurrentPage(1);
   }, [keyword]);
 
+  // 1. 검색 데이터 및 찜 목록 불러오기
   useEffect(() => {
-    const fetchSearchResults = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
+        
+        // (1) 검색 API 호출
         const response = await axios.get(`/api/stocks/search?keyword=${keyword}`);
         setStocks(response.data.stocks || []);
         setNewsList(response.data.news || []);
+
+        // (2) 로그인 상태라면 찜 목록 불러오기
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+            try {
+                const myNewsRes = await axios.get('/api/mypage/favorites/news', {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                
+                let rawList = myNewsRes.data;
+                if (!Array.isArray(rawList) && rawList.data) rawList = rawList.data;
+                if (!Array.isArray(rawList) && rawList.list) rawList = rawList.list;
+
+                if (Array.isArray(rawList)) {
+                    // ID만 추출해서 문자열로 저장
+                    const ids = rawList.map(item => {
+                        if (typeof item === 'object' && item !== null) {
+                            return String(item.newsId || item.id);
+                        }
+                        return String(item);
+                    }).filter(id => id && id !== 'undefined');
+                    
+                    setSavedBookmarks(ids);
+                }
+            } catch (e) {
+                console.error("찜 목록 로딩 실패 (로그인 안 된 경우 무시):", e);
+            }
+        }
+
       } catch (error) {
         console.error("검색 실패", error);
       } finally {
@@ -152,24 +210,61 @@ function SearchResultPage() {
     };
 
     if (keyword) {
-      fetchSearchResults();
+      fetchData();
     }
   }, [keyword]);
 
-  // ⭐ [추가] 현재 페이지에 해당하는 데이터 계산
+  // ⭐ [추가] 뉴스 찜하기 핸들러
+  const handleToggleNewsBookmark = async (news) => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) return alert("로그인이 필요한 기능입니다.");
+
+    const newsId = news.newsId || news.id;
+    if (!newsId) return alert("뉴스 ID 정보가 없습니다.");
+
+    const strNewsId = String(newsId);
+    const isBookmarked = savedBookmarks.includes(strNewsId);
+
+    try {
+        if (isBookmarked) {
+            // 삭제 요청
+            await axios.delete(`/api/mypage/favorites/news/${newsId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setSavedBookmarks(prev => prev.filter(id => id !== strNewsId));
+            alert("스크랩을 취소했습니다.");
+        } else {
+            // 추가 요청
+            await axios.post('/api/mypage/favorites/news', 
+                { newsId: newsId }, 
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            setSavedBookmarks(prev => [...prev, strNewsId]);
+            alert("뉴스를 스크랩했습니다.");
+        }
+    } catch (error) {
+        console.error("뉴스 찜 오류:", error);
+        alert("처리 중 오류가 발생했습니다.");
+    }
+  };
+
+  // 현재 페이지 데이터 계산
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
 
   const currentStocks = stocks.slice(indexOfFirstItem, indexOfLastItem);
   const currentNews = newsList.slice(indexOfFirstItem, indexOfLastItem);
 
-  // 페이지 버튼 수 계산 (뉴스 기준으로만 계산)
+  // 페이지 버튼 수 계산
+  const maxItems = Math.max(stocks.length, newsList.length);
+  const totalPages = Math.ceil(maxItems / itemsPerPage);
+  
+  // 뉴스용 페이지 수 (뉴스 섹션 페이지네이션용)
   const newsTotalPages = Math.ceil(newsList.length / itemsPerPage);
 
-  // 페이지 변경 핸들러
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
-    window.scrollTo(0, 0); // 페이지 변경 시 맨 위로 스크롤
+    window.scrollTo(0, 0);
   };
 
   return (
@@ -180,7 +275,7 @@ function SearchResultPage() {
         <p style={{textAlign:'center', marginTop:'50px'}}>검색 중...</p>
       ) : (
         <>
-            {/* 1. 종목 검색 결과 섹션 */}
+            {/* 1. 종목 검색 결과 */}
             <h3 style={styles.sectionTitle}>📈 종목 ({stocks.length})</h3>
             {currentStocks.length === 0 ? (
                 <p style={styles.emptyMsg}>검색된 종목이 없습니다.</p>
@@ -207,35 +302,53 @@ function SearchResultPage() {
                 ))
             )}
 
-            {/* 2. 뉴스 검색 결과 섹션 */}
+            {/* 2. 뉴스 검색 결과 (별표 추가됨) */}
             <h3 style={styles.sectionTitle}>📰 관련 뉴스 ({newsList.length})</h3>
             {currentNews.length === 0 ? (
                 <p style={styles.emptyMsg}>관련 뉴스가 없습니다.</p>
             ) : (
                 <div style={styles.newsListContainer}>
-                    {currentNews.map((news, idx) => (
-                        <a 
-                            key={news.newsId || idx} 
-                            href={news.url} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            style={styles.newsItem}
-                            onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#f9f9f9'}
-                            onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'white'}
-                        >
-                            <div style={styles.newsTitle}>{news.title}</div>
-                            <div style={styles.newsMeta}>
-                                <span>{news.newsDate ? new Date(news.newsDate).toLocaleDateString() : ''}</span>
+                    {currentNews.map((news, idx) => {
+                        const newsId = news.newsId || news.id || idx;
+                        // 찜 여부 확인
+                        const isBookmarked = savedBookmarks.includes(String(newsId));
+
+                        return (
+                            <div key={newsId} style={styles.newsItemWrapper}>
+                                <div style={styles.newsContent}>
+                                    <a 
+                                        href={news.url} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        style={styles.newsLink}
+                                    >
+                                        <div style={styles.newsTitle}>{news.title}</div>
+                                        <div style={styles.newsMeta}>
+                                            <span>{news.newsDate ? new Date(news.newsDate).toLocaleDateString() : ''}</span>
+                                        </div>
+                                    </a>
+                                </div>
+
+                                {/* ⭐ 별표 버튼 */}
+                                <button
+                                    onClick={() => handleToggleNewsBookmark(news)}
+                                    style={{ 
+                                        ...styles.newsStarButton, 
+                                        ...(isBookmarked ? styles.newsStarActive : {}) 
+                                    }}
+                                    title={isBookmarked ? "스크랩 취소" : "뉴스 스크랩"}
+                                >
+                                    {isBookmarked ? '★' : '☆'}
+                                </button>
                             </div>
-                        </a>
-                    ))}
+                        );
+                    })}
                 </div>
             )}
 
-            {/* ⭐ [수정] 페이지네이션 UI - 뉴스가 있고 뉴스 페이지가 2개 이상일 때만 표시 */}
-            {newsList.length > 0 && newsTotalPages > 1 && (
+            {/* 페이지네이션 UI */}
+            {totalPages > 1 && (
                 <div style={styles.pagination}>
-                    {/* 이전 버튼 */}
                     <button 
                         onClick={() => handlePageChange(currentPage - 1)}
                         disabled={currentPage === 1}
@@ -248,8 +361,7 @@ function SearchResultPage() {
                         &lt;
                     </button>
 
-                    {/* 페이지 번호 버튼들 */}
-                    {Array.from({ length: newsTotalPages }, (_, i) => i + 1).map((number) => (
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
                         <button
                             key={number}
                             onClick={() => handlePageChange(number)}
@@ -259,14 +371,13 @@ function SearchResultPage() {
                         </button>
                     ))}
 
-                    {/* 다음 버튼 */}
                     <button 
                         onClick={() => handlePageChange(currentPage + 1)}
-                        disabled={currentPage === newsTotalPages}
+                        disabled={currentPage === totalPages}
                         style={{
                             ...styles.pageBtn(false),
-                            opacity: currentPage === newsTotalPages ? 0.5 : 1,
-                            cursor: currentPage === newsTotalPages ? 'default' : 'pointer'
+                            opacity: currentPage === totalPages ? 0.5 : 1,
+                            cursor: currentPage === totalPages ? 'default' : 'pointer'
                         }}
                     >
                         &gt;
