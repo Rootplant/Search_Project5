@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useSearchParams, Link } from 'react-router-dom';
 
 // ==========================================
-// 1. 스타일 객체 정의 (라이브러리 의존성 제거)
+// 1. 스타일 객체 정의
 // ==========================================
 const styles = {
   container: {
@@ -99,7 +99,25 @@ const styles = {
     textDecoration: 'none',
     color: 'inherit',
     display: 'block',
-  }
+  },
+  // ⭐ [추가] 페이지네이션 스타일
+  pagination: {
+    display: 'flex',
+    justifyContent: 'center',
+    marginTop: '40px',
+    gap: '8px',
+  },
+  pageBtn: (isActive) => ({
+    padding: '8px 12px',
+    border: '1px solid #ddd',
+    backgroundColor: isActive ? '#007bff' : 'white',
+    color: isActive ? 'white' : '#333',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontSize: '14px',
+    fontWeight: isActive ? 'bold' : 'normal',
+    transition: 'all 0.2s',
+  }),
 };
 
 function SearchResultPage() {
@@ -107,23 +125,27 @@ function SearchResultPage() {
   const keyword = searchParams.get('keyword');
 
   const [stocks, setStocks] = useState([]);
-  const [newsList, setNewsList] = useState([]); // 뉴스 데이터 state
+  const [newsList, setNewsList] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // ⭐ [추가] 페이지네이션 상태
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5; // 한 페이지당 보여줄 개수 (5개씩)
+
+  // 검색어가 바뀌면 페이지를 1로 초기화
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [keyword]);
 
   useEffect(() => {
     const fetchSearchResults = async () => {
       try {
         setLoading(true);
-        // 백엔드 요청 (Map<String, Object> 반환)
         const response = await axios.get(`/api/stocks/search?keyword=${keyword}`);
-        
-        // 응답 구조: { stocks: [...], news: [...] }
         setStocks(response.data.stocks || []);
         setNewsList(response.data.news || []);
-
       } catch (error) {
         console.error("검색 실패", error);
-        // alert("검색 중 오류가 발생했습니다.");
       } finally {
         setLoading(false);
       }
@@ -133,6 +155,23 @@ function SearchResultPage() {
       fetchSearchResults();
     }
   }, [keyword]);
+
+  // ⭐ [추가] 현재 페이지에 해당하는 데이터 계산
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+
+  const currentStocks = stocks.slice(indexOfFirstItem, indexOfLastItem);
+  const currentNews = newsList.slice(indexOfFirstItem, indexOfLastItem);
+
+  // 페이지 버튼 수 계산 (종목과 뉴스 중 더 긴 목록 기준)
+  const maxItems = Math.max(stocks.length, newsList.length);
+  const totalPages = Math.ceil(maxItems / itemsPerPage);
+
+  // 페이지 변경 핸들러
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo(0, 0); // 페이지 변경 시 맨 위로 스크롤
+  };
 
   return (
     <div style={styles.container}>
@@ -144,10 +183,10 @@ function SearchResultPage() {
         <>
             {/* 1. 종목 검색 결과 섹션 */}
             <h3 style={styles.sectionTitle}>📈 종목 ({stocks.length})</h3>
-            {stocks.length === 0 ? (
+            {currentStocks.length === 0 ? (
                 <p style={styles.emptyMsg}>검색된 종목이 없습니다.</p>
             ) : (
-                stocks.map((stock) => (
+                currentStocks.map((stock) => (
                 <Link 
                     to={`/stock/${stock.stockCode}`} 
                     key={stock.stockCode} 
@@ -161,7 +200,6 @@ function SearchResultPage() {
                         <div style={styles.price}>
                             {stock.price ? stock.price.toLocaleString() : '-'}원 
                             <span style={{fontSize: '12px', marginLeft: '5px', color: '#333'}}>
-                            {/* 등락률이 있으면 표시 */}
                             {stock.changeRate !== undefined ? `(${stock.changeRate}%)` : ''}
                             </span>
                         </div>
@@ -172,11 +210,11 @@ function SearchResultPage() {
 
             {/* 2. 뉴스 검색 결과 섹션 */}
             <h3 style={styles.sectionTitle}>📰 관련 뉴스 ({newsList.length})</h3>
-            {newsList.length === 0 ? (
+            {currentNews.length === 0 ? (
                 <p style={styles.emptyMsg}>관련 뉴스가 없습니다.</p>
             ) : (
                 <div style={styles.newsListContainer}>
-                    {newsList.map((news, idx) => (
+                    {currentNews.map((news, idx) => (
                         <a 
                             key={news.newsId || idx} 
                             href={news.url} 
@@ -192,6 +230,48 @@ function SearchResultPage() {
                             </div>
                         </a>
                     ))}
+                </div>
+            )}
+
+            {/* ⭐ [추가] 페이지네이션 UI */}
+            {totalPages > 1 && (
+                <div style={styles.pagination}>
+                    {/* 이전 버튼 */}
+                    <button 
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                        style={{
+                            ...styles.pageBtn(false),
+                            opacity: currentPage === 1 ? 0.5 : 1,
+                            cursor: currentPage === 1 ? 'default' : 'pointer'
+                        }}
+                    >
+                        &lt;
+                    </button>
+
+                    {/* 페이지 번호 버튼들 */}
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
+                        <button
+                            key={number}
+                            onClick={() => handlePageChange(number)}
+                            style={styles.pageBtn(currentPage === number)}
+                        >
+                            {number}
+                        </button>
+                    ))}
+
+                    {/* 다음 버튼 */}
+                    <button 
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                        style={{
+                            ...styles.pageBtn(false),
+                            opacity: currentPage === totalPages ? 0.5 : 1,
+                            cursor: currentPage === totalPages ? 'default' : 'pointer'
+                        }}
+                    >
+                        &gt;
+                    </button>
                 </div>
             )}
         </>
