@@ -72,7 +72,7 @@ REM ============================================================
 echo [1] 뉴스 크롤링 스케줄러 등록 중... (스케줄러 모드: --scheduler)
 echo     실행 주기: 매시 정각 (00:00, 01:00, 02:00, ...)
 echo     작업 경로: %WORK_DIR%\%CRAWLER_SCRIPT%
-schtasks /Create /TN "KStockNewsCrawler" /TR "\"%PYTHON_PATH%\" \"%WORK_DIR%\%CRAWLER_SCRIPT%\" --scheduler" /SC HOURLY /MO 1 /ST 00:00 /RU SYSTEM /RL HIGHEST /F
+schtasks /Create /TN "KStockNewsCrawler" /TR "\"%PYTHON_PATH%\" \"%WORK_DIR%\%CRAWLER_SCRIPT%\" --scheduler" /SC HOURLY /MO 1 /ST 00:00 /RL HIGHEST /F /IT
 
 if %ERRORLEVEL% EQU 0 (
     echo     ✓ 뉴스 크롤링 스케줄러 등록 완료!
@@ -85,7 +85,7 @@ echo.
 echo [2] 감성 분석 스케줄러 등록 중...
 echo     실행 주기: 매시 5분 (00:05, 01:05, 02:05, ...)
 echo     작업 경로: %WORK_DIR%\%SENTIMENT_SCRIPT%
-schtasks /Create /TN "KStockSentimentAnalyzer" /TR "\"%PYTHON_PATH%\" \"%WORK_DIR%\%SENTIMENT_SCRIPT%\"" /SC HOURLY /MO 1 /ST 00:05 /RU SYSTEM /RL HIGHEST /F
+schtasks /Create /TN "KStockSentimentAnalyzer" /TR "\"%PYTHON_PATH%\" \"%WORK_DIR%\%SENTIMENT_SCRIPT%\"" /SC HOURLY /MO 1 /ST 00:05 /RL HIGHEST /F /IT
 
 if %ERRORLEVEL% EQU 0 (
     echo     ✓ 감성 분석 스케줄러 등록 완료!
@@ -122,6 +122,8 @@ echo 뉴스 크롤러: 매시 정각 실행 (00:00, 01:00, 02:00, ...)
 echo 감성 분석기: 매시 5분 실행 (00:05, 01:05, 02:05, ...)
 echo 실행 주기: 정확히 1시간마다 (실시간 실행 방지)
 echo 스케줄러 모드: 새로운 뉴스만 추가 (100개 목표 없음)
+echo 실행 계정: 현재 로그인 사용자 (네트워크 접근 가능)
+echo 재부팅 후: 사용자가 로그인한 상태에서만 실행됩니다.
 echo.
 echo 주의: 수동으로 크롤러를 실행하면 스케줄러와 관계없이 실행됩니다.
 echo    스케줄러만 사용하려면 수동 실행을 하지 마세요.
