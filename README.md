@@ -365,21 +365,57 @@ CSV 파일로 다운로드할 수 있도록 하여,
 
 ```plaintext
 📦 k-stock-insight
-├─ backend
-│  ├─ controller
-│  ├─ service
-│  ├─ dao
-│  ├─ dto
-│  ├─ security
-│  └─ mapper
+├─ FRONTEND/                              # Vite + React
+│  ├─ node_modules/
+│  ├─ public/
+│  │  └─ vite.svg
+│  ├─ src/
+│  │  ├─ admin/                           # 관리자 화면/컴포넌트
+│  │  ├─ api/                             # API 호출 모듈(axios 등)
+│  │  ├─ assets/                          # 이미지/아이콘 등 정적 리소스
+│  │  ├─ components/                      # 공용 컴포넌트
+│  │  ├─ context/                         # 전역 상태/인증 컨텍스트
+│  │  ├─ layouts/                         # 레이아웃(헤더/사이드바 등)
+│  │  ├─ pages/                           # 페이지 단위 컴포넌트
+│  │  ├─ routes/                          # 라우팅 설정
+│  │  ├─ styles/                          # 스타일(CSS)
+│  │  ├─ AboutPage.jsx
+│  │  ├─ App.jsx
+│  │  ├─ App.css
+│  │  ├─ index.css
+│  │  └─ main.jsx
+│  ├─ .env.example
+│  ├─ .gitignore
+│  ├─ eslint.config.js
+│  ├─ index.html
+│  ├─ package.json
+│  ├─ package-lock.json
+│  ├─ README.md
+│  └─ vite.config.js
 │
-├─ frontend
-│  ├─ pages
-│  ├─ components
-│  └─ api
-│
-└─ database
-   └─ ddl.sql
+├─ BACKEND/                               # Spring Boot + Gradle
+│  ├─ src/
+│  │  ├─ main/
+│  │  │  ├─ java/
+│  │  │  │  ├─ com.boot/                  # (루트 패키지)
+│  │  │  │  ├─ com.boot.cache/
+│  │  │  │  ├─ com.boot.config/
+│  │  │  │  ├─ com.boot.controller/
+│  │  │  │  ├─ com.boot.dao/
+│  │  │  │  ├─ com.boot.dto/
+│  │  │  │  ├─ com.boot.scheduler/
+│  │  │  │  ├─ com.boot.security/
+│  │  │  │  └─ com.boot.service/
+│  │  │  └─ resources/                    # application.properties, mybatis mapper 등
+│  │  └─ test/
+│  │     └─ java/
+│  ├─ bin/
+│  ├─ gradle/
+│  ├─ build.gradle
+│  ├─ settings.gradle
+│  ├─ gradlew
+│  └─ gradlew.bat
+
 ```
 
 ---
