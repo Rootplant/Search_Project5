@@ -183,7 +183,7 @@
 📄 ERD  
 <details> <summary><strong>ERD 다이어그램</strong></summary>
 
-<img width="568" height="843" alt="image" src="https://github.com/user-attachments/assets/6d96c569-3365-4a94-93a0-21840de464fb" />
+<img width="568" height="843" alt="table" src="https://github.com/user-attachments/assets/db3ff890-d5fd-43aa-8861-5ef84e34b54c" />
 
 </details>
 
