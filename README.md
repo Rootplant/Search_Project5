@@ -62,10 +62,12 @@
 | **Frontend** | React, JavaScript |
 | **Backend** | Spring Boot, Java, MyBatis |
 | **Database** | Oracle |
-| **Security** | JWT, OAuth2 (Google / Kakao / Naver) |
-| **Infra** | AWS EC2 (Ubuntu) |
+| **Security** | JWT (Access / Refresh Token), OAuth2 (Google / Kakao / Naver) |
+| **Data / Crawling** | Python, Requests, BeautifulSoup |
+| **Cache / Scheduler** | Redis, Spring Scheduler |
+| **Infra / Server** | AWS EC2 (Ubuntu), Tomcat |
 | **Build Tool** | Gradle |
-| **Tools** | GitHub, SourceTree, Figma |
+| **Tools** | VS Code, Postman, GitHub, SourceTree |
 
 ---
 
