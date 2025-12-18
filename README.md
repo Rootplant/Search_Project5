@@ -62,8 +62,8 @@
 | **Frontend** | <img src="https://img.shields.io/badge/react-61DAFB?style=flat-square&logi=html5&logoColor=white"> <img src="https://img.shields.io/badge/javascript-F7DF1E?style=flat-square&logi=html5&logoColor=white"> |
 | **Backend** | <img src="https://img.shields.io/badge/springboot-6DB33F?style=flat-square&logi=html5&logoColor=white"> <img src="https://img.shields.io/badge/Java-F7DF1E?style=flat-square&logi=html5&logoColor=white"> <img src="https://img.shields.io/badge/Lombok-4285F4?style=flat-square&logi=html5&logoColor=white"> <img src="https://img.shields.io/badge/MyBatis-006600?style=flat-square&logi=html5&logoColor=white"> |
 | **Database** | <img src="https://img.shields.io/badge/Oracle Database-09476B?style=flat-square&logi=html5&logoColor=white"> |
-| **Security** | <img src="https://img.shields.io/badge/JWT (Access / Refresh Token)-001E59?style=flat-square&logi=html5&logoColor=white"> OAuth2 (Google / Kakao / Naver) |
-| **Data / Crawling** | Python, Requests, BeautifulSoup |
+| **Security** | <img src="https://img.shields.io/badge/JWT (Access / Refresh Token)-001E59?style=flat-square&logi=html5&logoColor=white"> <img src="https://img.shields.io/badge/springsecurity-6DB33F?style=flat-square&logi=html5&logoColor=white"> |
+| **Data / Crawling** | <img src="https://img.shields.io/badge/python-3776AB?style=flat-square&logi=html5&logoColor=white"> Requests, BeautifulSoup |
 | **Cache / Scheduler** | Redis, Spring Scheduler |
 | **Infra / Server** | AWS EC2 (Ubuntu) <img src="https://img.shields.io/badge/Apache Tomcat-F8DC75?style=flat-square&logi=html5&logoColor=white"> |
 | **Build Tool** | <img src="https://img.shields.io/badge/Gradle-02303A?style=flat-square&logi=html5&logoColor=white"> |
