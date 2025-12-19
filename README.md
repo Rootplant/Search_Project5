@@ -372,7 +372,7 @@ https://github.com/user-attachments/assets/1cc578bb-f4b8-42b3-9ee5-80405dc552ce
 
 📌 설명
 관리자에 의해 수행된 주요 관리 작업에 대해
-작업 로그(Audit Log)를 기록하도록 설계했습니다.
+작업 로그(Admin Log)를 기록하도록 설계했습니다.
 
 계정 상태 변경, 권한 변경, 토큰 강제 만료와 같은
 중요한 관리자 작업을 로그로 남기고,
