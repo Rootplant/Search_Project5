@@ -174,7 +174,7 @@
   - Refresh Token 강제 만료
 - **로그 관리**
   - 로그인 로그
-  - 관리자 작업 로그(Audit Log)
+  - 관리자 작업 로그(Admin Log)
 
 </details>
 
