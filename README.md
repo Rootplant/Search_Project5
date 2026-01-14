@@ -254,7 +254,7 @@ React 기반으로 전체 서비스 UI를 구현했습니다.
 
 </details>
 
----
+
 
 ⚡ 종목 상세 페이지 실시간 차트
 <details>
@@ -272,7 +272,7 @@ React 기반으로 전체 서비스 UI를 구현했습니다.
 
 </details>
 
----
+
 
 📡 종목 주가 실시간 데이터 처리 (WebSocket)
 <details>
@@ -290,7 +290,7 @@ React 기반으로 전체 서비스 UI를 구현했습니다.
 
 </details>
 
----
+
 
 ⚡ Redis 캐싱 처리
 <details>
@@ -311,7 +311,7 @@ Redis에 캐싱하여 성능을 최적화했습니다.
 
 </details>
 
----
+
 
 📈 차트 상태 관리 및 성능 최적화
 <details>
