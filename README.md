@@ -276,6 +276,7 @@ React 기반으로 전체 서비스 UI를 구현했습니다.
 ⚡ 종목 상세 페이지 실시간 차트
 <details>
 <summary><strong>상세 페이지 실시간 주가 차트</strong></summary>
+<img width="833" height="635" alt="image" src="https://github.com/user-attachments/assets/c3e6b777-b267-49cc-9f97-6bd5bec571f6" />
 
 📌 설명  
 
