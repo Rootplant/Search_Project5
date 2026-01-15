@@ -239,6 +239,7 @@
 🎨 프론트엔드 (React)
 <details>
 <summary><strong>메인 화면 및 UI 구성</strong></summary>
+<img width="897" height="627" alt="image" src="https://github.com/user-attachments/assets/17e7ef82-1489-4aca-8505-826ebc9a8ff0" />
 
 📌 설명  
 
