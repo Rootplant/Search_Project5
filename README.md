@@ -294,7 +294,10 @@ React 기반으로 전체 서비스 UI를 구현했습니다.
 <details>
 <summary><strong>WebSocket 기반 실시간 시세 처리</strong></summary>
 <img width="940" height="687" alt="image" src="https://github.com/user-attachments/assets/b4a5dfbb-683a-48a6-9e1a-77ce0a25a63a" />
-https://github.com/user-attachments/assets/fa07d041-1f5a-44ed-ba27-8608fe77f09c
+
+<video controls width="800">
+  <source src="https://github.com/user-attachments/assets/fa07d041-1f5a-44ed-ba27-8608fe77f09c" type="video/mp4">
+</video>
 
 
 📌 설명  
