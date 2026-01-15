@@ -259,6 +259,7 @@ React 기반으로 전체 서비스 UI를 구현했습니다.
 📊 지수 그래프 시각화
 <details>
 <summary><strong>코스피 및 시장 지수 시각화</strong></summary>
+<img width="567" height="295" alt="image" src="https://github.com/user-attachments/assets/5d832192-44fb-49c0-91ea-9eeb75812432" />
 
 📌 설명  
 
