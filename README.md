@@ -293,6 +293,8 @@ React 기반으로 전체 서비스 UI를 구현했습니다.
 📡 종목 주가 실시간 데이터 처리 (WebSocket)
 <details>
 <summary><strong>WebSocket 기반 실시간 시세 처리</strong></summary>
+<img width="940" height="687" alt="image" src="https://github.com/user-attachments/assets/b4a5dfbb-683a-48a6-9e1a-77ce0a25a63a" />
+
 
 📌 설명  
 
