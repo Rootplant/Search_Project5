@@ -336,7 +336,7 @@ Redis에 캐싱하여 성능을 최적화했습니다.
 <summary><strong>🏠 메인 화면</strong></summary>
 
 <p align="center">
-  <!-- 메인 화면 이미지 삽입 예정 -->
+  <img width="670" height="779" alt="image" src="https://github.com/user-attachments/assets/ac69c269-f321-4dce-8c94-72b4cd581792" />
 </p>
 
 </details>
@@ -347,7 +347,7 @@ Redis에 캐싱하여 성능을 최적화했습니다.
 <summary><strong>📊 감성 대시보드</strong></summary>
 
 <p align="center">
-  <!-- 뉴스 감성 분석 대시보드 이미지 삽입 예정 -->
+  <img width="1406" height="875" alt="image" src="https://github.com/user-attachments/assets/067c53c9-39f4-4ee6-95e8-3b1fa55f1a61" />
 </p>
 
 </details>
@@ -358,7 +358,7 @@ Redis에 캐싱하여 성능을 최적화했습니다.
 <summary><strong>📈 키워드 트렌드</strong></summary>
 
 <p align="center">
-  <!-- 키워드 트렌드 분석 화면 이미지 삽입 예정 -->
+  <img width="954" height="875" alt="image" src="https://github.com/user-attachments/assets/82452ffd-94a4-4a1b-9be2-af3aad1f7087" />
 </p>
 
 </details>
@@ -369,6 +369,10 @@ Redis에 캐싱하여 성능을 최적화했습니다.
 <summary><strong>🏆 시가총액 순위</strong></summary>
 
 <p align="center">
+
+https://github.com/user-attachments/assets/e147106e-2a1b-417d-90a4-24f512b4e832
+
+
   <!-- 시가총액 순위 화면 이미지 삽입 예정 -->
 </p>
 
@@ -406,6 +410,7 @@ Redis에 캐싱하여 성능을 최적화했습니다.
 </p>
 
 </details>
+---
 🔐 인증 / 보안
 <details> <summary><strong>회원가입</strong></summary>
 
