@@ -124,7 +124,7 @@
 ---
 ## 🔍 내가 구현한 핵심 기능
 
-### 🎨 프론트엔드 (React) – 메인 화면 및 UI 구성
+### 🎨 프론트엔드 (React) – 서비스 화면 및 UI 구성
 <img width="897" height="627" alt="image" src="https://github.com/user-attachments/assets/17e7ef82-1489-4aca-8505-826ebc9a8ff0" />
 
 - React 기반 전체 서비스 UI 구현  
@@ -132,7 +132,7 @@
 - 공용 컴포넌트 및 페이지 라우팅 구조 설계  
 <a href="#-서비스-화면-예시">
   <img src="https://img.shields.io/badge/📸%20서비스%20화면%20예시-바로가기-orange?style=for-the-badge">
-</a>
+</a> 
 
 
 ---
