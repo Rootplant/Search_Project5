@@ -188,10 +188,14 @@ React 기반으로 전체 서비스 UI를 구현했습니다.
 <p align="center">
 
 https://github.com/user-attachments/assets/e147106e-2a1b-417d-90a4-24f512b4e832
-https://github.com/user-attachments/assets/5ca7d6bf-893e-40db-a9e0-f5c64fed8d29
+
 </p>
-https://github.com/user-attachments/assets/e147106e-2a1b-417d-90a4-24f512b4e832
+<p align="center">
+  
 https://github.com/user-attachments/assets/5ca7d6bf-893e-40db-a9e0-f5c64fed8d29
+
+</p>
+
 
 📌 설명  
 
