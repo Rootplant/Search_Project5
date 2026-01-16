@@ -412,7 +412,9 @@ https://github.com/user-attachments/assets/5ca7d6bf-893e-40db-a9e0-f5c64fed8d29
 </p>
 
 </details>
+
 ---
+
 🔐 인증 / 보안
 <details> <summary><strong>회원가입</strong></summary>
 
