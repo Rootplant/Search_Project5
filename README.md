@@ -133,7 +133,10 @@
 <a href="#-서비스-화면-예시">
   <img src="https://img.shields.io/badge/📸%20서비스%20화면%20예시-바로가기-orange?style=for-the-badge">
 </a>
+
+
 ---
+
 
 ### 📊 지수 그래프 시각화
 <img width="567" height="295" alt="image" src="https://github.com/user-attachments/assets/5d832192-44fb-49c0-91ea-9eeb75812432" />
