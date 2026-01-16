@@ -650,6 +650,7 @@ CSV 파일로 다운로드할 수 있도록 하여,
 ### 📌 전체 시연 영상
 🔗 YouTube 링크: https://youtu.be/5spm6NijYE4 (사용자)<br>
 🔗 YouTube 링크: https://youtu.be/cdFkztkbYDM (관리자)
-
+### 📌 실시간 데이터 테스트 영상
+🔗 YouTube 링크: https://www.youtube.com/watch?v=H0i5x7l80Ns
 
 ---
