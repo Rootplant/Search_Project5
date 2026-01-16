@@ -372,8 +372,6 @@ Redis에 캐싱하여 성능을 최적화했습니다.
 
 https://github.com/user-attachments/assets/e147106e-2a1b-417d-90a4-24f512b4e832
 
-
-  <!-- 시가총액 순위 화면 이미지 삽입 예정 -->
 </p>
 
 </details>
@@ -384,7 +382,7 @@ https://github.com/user-attachments/assets/e147106e-2a1b-417d-90a4-24f512b4e832
 <summary><strong>🔍 종목 검색</strong></summary>
 
 <p align="center">
-  <!-- 종목 검색 결과 화면 이미지 삽입 예정 -->
+  <img width="646" height="783" alt="image" src="https://github.com/user-attachments/assets/fbb7a0b0-ed44-47d2-8aa1-c2b790a0f05b" />
 </p>
 
 </details>
@@ -395,7 +393,9 @@ https://github.com/user-attachments/assets/e147106e-2a1b-417d-90a4-24f512b4e832
 <summary><strong>📉 주식 상세 페이지</strong></summary>
 
 <p align="center">
-  <!-- 주식 상세 페이지 (차트 / 뉴스 / 지표) 이미지 삽입 예정 -->
+
+https://github.com/user-attachments/assets/5ca7d6bf-893e-40db-a9e0-f5c64fed8d29
+
 </p>
 
 </details>
@@ -406,7 +406,9 @@ https://github.com/user-attachments/assets/e147106e-2a1b-417d-90a4-24f512b4e832
 <summary><strong>👤 마이페이지</strong></summary>
 
 <p align="center">
-  <!-- 마이페이지 화면 이미지 삽입 예정 -->
+  <img width="752" height="309" alt="image" src="https://github.com/user-attachments/assets/90a40084-d94c-4174-8f4b-d416b5b16cbb" />
+  <img width="757" height="725" alt="image" src="https://github.com/user-attachments/assets/6d9d492e-986c-4539-b3d4-6b7b4dc1a260" />
+  <img width="753" height="452" alt="image" src="https://github.com/user-attachments/assets/28868cd3-dbcf-4af8-8048-942c4a6dc8ac" />
 </p>
 
 </details>
