@@ -124,137 +124,61 @@
 ---
 ## 🔍 내가 구현한 핵심 기능
 
-🎨 프론트엔드 (React)
-<details>
-<summary><strong>메인 화면 및 UI 구성</strong></summary>
+### 🎨 프론트엔드 (React) – 메인 화면 및 UI 구성
 <img width="897" height="627" alt="image" src="https://github.com/user-attachments/assets/17e7ef82-1489-4aca-8505-826ebc9a8ff0" />
 
-📌 설명  
+- React 기반 전체 서비스 UI 구현  
+- 사용자 흐름 중심의 화면 구조 설계  
+- 공용 컴포넌트 및 페이지 라우팅 구조 설계  
 
-React 기반으로 전체 서비스 UI를 구현했습니다.  
-메인 페이지, 검색 결과, 종목 상세 페이지 등  
-사용자 흐름에 맞춘 화면 구조를 설계했습니다.
+---
 
-- 공용 컴포넌트(Header, Layout, Chart 영역 등) 분리
-- React Router 기반 페이지 라우팅 구성
-- API 연동 결과에 따른 동적 UI 렌더링
-- 사용자 인터랙션 중심의 화면 설계
-
-</details>
-
-
-
-📊 지수 그래프 시각화
-<details>
-<summary><strong>코스피 및 시장 지수 시각화</strong></summary>
+### 📊 지수 그래프 시각화
 <img width="567" height="295" alt="image" src="https://github.com/user-attachments/assets/5d832192-44fb-49c0-91ea-9eeb75812432" />
 
-📌 설명  
+- 코스피 및 주요 시장 지수 시각화  
+- 시계열 데이터 기반 그래프 렌더링  
 
-코스피 및 주요 시장 지수 데이터를 기반으로  
-시간 흐름에 따른 **지수 변화 그래프**를 시각화했습니다.
+---
 
-- 일/분 단위 시계열 데이터 처리
-- 차트 데이터 가공 및 렌더링 로직 구현
-- 사용자 관점에서 직관적인 지수 흐름 확인 가능
+### ⚡ 종목 상세 페이지 & 시가총액 실시간 데이터
 
-</details>
-
-
-
-⚡ 종목 상세 페이지 실시간 차트
-<details>
-<summary><strong>상세 페이지 실시간 주가 차트</strong></summary>
 <p align="center">
-
 https://github.com/user-attachments/assets/e147106e-2a1b-417d-90a4-24f512b4e832
-
 </p>
+
 <p align="center">
-  
 https://github.com/user-attachments/assets/5ca7d6bf-893e-40db-a9e0-f5c64fed8d29
-
 </p>
 
-📌 설명  
+- 종목 상세 페이지 실시간 주가 차트 구현  
+- 시가총액 및 가격 변동 실시간 반영  
 
-종목 상세 페이지에서  
-**실시간 주가 변동을 차트로 즉시 반영**하도록 구현했습니다.
+---
 
-- WebSocket을 통한 실시간 주가 데이터 수신
-- 기존 차트 데이터에 실시간 데이터 누적
-- 페이지 이동 시 WebSocket 구독/해제 처리
-- 불필요한 연결 유지 방지 및 안정성 확보
-
-</details>
-
-
-
-📡 종목 주가 실시간 데이터 처리 (WebSocket)
-<details>
-<summary><strong>WebSocket 기반 실시간 시세 처리</strong></summary>
-<img width="940" height="687" alt="image" src="https://github.com/user-attachments/assets/b4a5dfbb-683a-48a6-9e1a-77ce0a25a63a" />
+### 📡 종목 주가 실시간 데이터 처리 (WebSocket)
 
 <p align="center">
-
-  https://github.com/user-attachments/assets/c24c0f17-4f22-463e-9451-4ff72c5dddb6
-
+https://github.com/user-attachments/assets/c24c0f17-4f22-463e-9451-4ff72c5dddb6
 </p>
 
+- WebSocket 기반 실시간 주가 데이터 수신  
+- 종목 코드 기준 구독/해제 관리  
 
+---
 
+### ⚡ Redis 캐싱 처리
 
+- 지수 및 종목 데이터 Redis 캐싱  
+- DB 조회 횟수 감소 및 성능 최적화  
 
+---
 
-📌 설명  
+### 📈 차트 상태 관리 및 성능 최적화
 
-서버와 WebSocket 연결을 통해  
-종목별 실시간 주가 데이터를 수신하고 UI에 반영했습니다.
+- 실시간 데이터 상태 분리 관리  
+- 불필요한 재렌더링 최소화  
 
-- 종목 코드 기준 실시간 구독 관리
-- 다중 종목 처리 시 성능 고려
-- 연결 종료 및 재연결 상황 대응
-- REST API + WebSocket 병행 구조 설계
-
-</details>
-
-
-
-⚡ Redis 캐싱 처리
-<details>
-<summary><strong>Redis 기반 지수·종목 데이터 캐싱</strong></summary>
-
-📌 설명  
-
-빈번하게 조회되는 지수 및 종목 데이터를  
-Redis에 캐싱하여 성능을 최적화했습니다.
-
-- 실시간성이 상대적으로 낮은 데이터 캐싱
-- DB 조회 횟수 감소
-- 초기 페이지 로딩 속도 개선
-- 스케줄러 기반 데이터 갱신 구조와 연계
-
-이를 통해 다수 사용자가 동시에 접근하더라도  
-안정적인 조회 성능을 유지할 수 있도록 했습니다.
-
-</details>
-
-
-
-📈 차트 상태 관리 및 성능 최적화
-<details>
-<summary><strong>실시간 데이터 상태 관리</strong></summary>
-
-📌 설명  
-
-실시간 데이터와 React 상태를 효율적으로 관리하여  
-불필요한 재렌더링을 최소화했습니다.
-
-- 차트 데이터 상태 분리 관리
-- 실시간 데이터 수신 시 필요한 부분만 업데이트
-- 사용자 경험을 해치지 않는 실시간 UI 반영
-
-</details>
 
 
 ---
