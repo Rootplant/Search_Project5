@@ -173,6 +173,8 @@ https://github.com/user-attachments/assets/eb021d96-4896-4778-944c-647eedad6857
 
 
 </p>
+<img width="1088" height="437" alt="image" src="https://github.com/user-attachments/assets/c819473e-b5c4-4eab-940f-37f9839a316d" />
+
 
 - WebSocket 기반 실시간 주가 데이터 수신  
 - 종목 코드 기준 구독/해제 관리  
