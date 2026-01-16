@@ -130,7 +130,9 @@
 - React 기반 전체 서비스 UI 구현  
 - 사용자 흐름 중심의 화면 구조 설계  
 - 공용 컴포넌트 및 페이지 라우팅 구조 설계  
-
+<a href="#-서비스-화면-예시">
+  <img src="https://img.shields.io/badge/📸%20서비스%20화면%20예시-바로가기-orange?style=for-the-badge">
+</a>
 ---
 
 ### 📊 지수 그래프 시각화
