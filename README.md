@@ -144,11 +144,19 @@
 ### ⚡ 종목 상세 페이지 & 시가총액 실시간 데이터
 
 <p align="center">
-https://github.com/user-attachments/assets/e147106e-2a1b-417d-90a4-24f512b4e832
+
+
+https://github.com/user-attachments/assets/4c86acc8-4d1b-4250-87af-75b4edc7d305
+
+
 </p>
 
 <p align="center">
-https://github.com/user-attachments/assets/5ca7d6bf-893e-40db-a9e0-f5c64fed8d29
+
+
+https://github.com/user-attachments/assets/85ec01e8-298e-494d-9eba-ed22ebacde2b
+
+
 </p>
 
 - 종목 상세 페이지 실시간 주가 차트 구현  
@@ -159,7 +167,11 @@ https://github.com/user-attachments/assets/5ca7d6bf-893e-40db-a9e0-f5c64fed8d29
 ### 📡 종목 주가 실시간 데이터 처리 (WebSocket)
 
 <p align="center">
-https://github.com/user-attachments/assets/c24c0f17-4f22-463e-9451-4ff72c5dddb6
+
+
+https://github.com/user-attachments/assets/eb021d96-4896-4778-944c-647eedad6857
+
+
 </p>
 
 - WebSocket 기반 실시간 주가 데이터 수신  
