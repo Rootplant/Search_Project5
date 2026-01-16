@@ -122,118 +122,6 @@
   - 신규 데이터 발생 시에만 DB에 **증분 삽입**하여 과부하 최소
 
 ---
-
-
-## 🧩 기능 구성 (클릭해서 보기)
-
-<details>
-<summary><strong>📈 사용자 기능</strong></summary>
-
-- 종목 검색 및 상세 조회  
-- 종목 현재가, 등락률, 시가총액 정보 제공  
-- 종목별 뉴스 조회  
-- 뉴스 감성 분석 결과 확인  
-- 키워드 기반 뉴스 요약 및 트렌드 분석  
-- 시장 및 종목 차트 시각화  
-
-</details>
-
-<details>
-<summary><strong>📰 데이터 수집 및 분석 기능</strong></summary>
-
-- 주식 관련 뉴스 자동 수집(크롤링)  
-- 뉴스 중복 제거 및 원문(CLOB) 저장  
-- 뉴스–종목 자동 매칭  
-- 배치/스케줄 기반 데이터 수집 구조  
-
-</details>
-
-<details>
-<summary><strong>🧠 분석 및 인사이트 제공</strong></summary>
-
-- 뉴스 본문 기반 감성 분석 (긍정 / 보통 / 부정)  
-- 종목별 감성 비율 집계  
-- 시장 전체 감성 흐름 요약  
-- 키워드 빈도 기반 트렌드 분석  
-
-</details>
-
-<details>
-<summary><strong>🔍 검색 엔진</strong></summary>
-
-- 종목명 / 종목코드 검색  
-- 뉴스 제목·키워드 검색  
-- 종목·뉴스 통합 검색 결과 제공  
-
-</details>
-
-<details>
-<summary><strong>🔐 회원 / 인증 기능</strong></summary>
-
-- 회원가입 / 로그인 / 로그아웃  
-- JWT 기반 인증 (Access / Refresh Token 분리)  
-- 소셜 로그인 (Google / Kakao / Naver)  
-- 비밀번호 찾기 및 재설정(이메일 인증)  
-- 로그인 실패 횟수 제한 및 계정 잠금 처리  
-
-</details>
-
-<details>
-<summary><strong>🛠 관리자 기능</strong></summary>
-
-- **관리자 대시보드**
-  - 사용자 수, 로그인 현황, 뉴스 수집 상태 모니터링
-- **회원 관리**
-  - 계정 정지 / 해제
-  - 권한 변경(USER / ADMIN)
-- **토큰 관리**
-  - Refresh Token 강제 만료
-- **로그 관리**
-  - 로그인 로그
-  - 관리자 작업 로그(Admin Log)
-
-</details>
-
-<details>
-<summary><strong>🔍 로그 & 보안</strong></summary>
-
-- 로그인 성공 / 실패 / 잠금 로그 기록  
-- 관리자 모든 행위 로그 기록  
-- IP / User-Agent 기반 접속 정보 저장  
-- 운영·보안 감사 목적 로그 구조 설계  
-
-</details>
-
----
-
-## 🧭 메뉴 구조도 (PDF)
-
-📄 메뉴 구조도 다운로드  
-👉 [menu structure.pdf](https://github.com/user-attachments/files/24228651/menu.structure.pdf)
-
----
-
-## 🖥 화면 설계서 (PDF)
-
-📄 화면 설계서 보기  
-👉 [ui-design.pdf](https://github.com/user-attachments/files/24228667/ui-design.pdf)
-
----
-
-## 🗂 ERD 및 테이블 명세서
-
-📄 ERD  
-<details> <summary><strong>ERD 다이어그램</strong></summary>
-
-<img width="1322" height="988" alt="image" src="https://github.com/user-attachments/assets/e0c61011-41fa-411f-88bb-625aa8cf5cdd" />
-
-</details>
-
-📄 테이블 명세서  
-👉 [table-definition.xls](https://github.com/user-attachments/files/24228696/table-definition.xls)
-
----
-
 ## 🔍 담당 기능
 
 🎨 프론트엔드 (React)
@@ -355,6 +243,117 @@ Redis에 캐싱하여 성능을 최적화했습니다.
 
 
 ---
+
+## 🧩 기능 구성 (클릭해서 보기)
+
+<details>
+<summary><strong>📈 사용자 기능</strong></summary>
+
+- 종목 검색 및 상세 조회  
+- 종목 현재가, 등락률, 시가총액 정보 제공  
+- 종목별 뉴스 조회  
+- 뉴스 감성 분석 결과 확인  
+- 키워드 기반 뉴스 요약 및 트렌드 분석  
+- 시장 및 종목 차트 시각화  
+
+</details>
+
+<details>
+<summary><strong>📰 데이터 수집 및 분석 기능</strong></summary>
+
+- 주식 관련 뉴스 자동 수집(크롤링)  
+- 뉴스 중복 제거 및 원문(CLOB) 저장  
+- 뉴스–종목 자동 매칭  
+- 배치/스케줄 기반 데이터 수집 구조  
+
+</details>
+
+<details>
+<summary><strong>🧠 분석 및 인사이트 제공</strong></summary>
+
+- 뉴스 본문 기반 감성 분석 (긍정 / 보통 / 부정)  
+- 종목별 감성 비율 집계  
+- 시장 전체 감성 흐름 요약  
+- 키워드 빈도 기반 트렌드 분석  
+
+</details>
+
+<details>
+<summary><strong>🔍 검색 엔진</strong></summary>
+
+- 종목명 / 종목코드 검색  
+- 뉴스 제목·키워드 검색  
+- 종목·뉴스 통합 검색 결과 제공  
+
+</details>
+
+<details>
+<summary><strong>🔐 회원 / 인증 기능</strong></summary>
+
+- 회원가입 / 로그인 / 로그아웃  
+- JWT 기반 인증 (Access / Refresh Token 분리)  
+- 소셜 로그인 (Google / Kakao / Naver)  
+- 비밀번호 찾기 및 재설정(이메일 인증)  
+- 로그인 실패 횟수 제한 및 계정 잠금 처리  
+
+</details>
+
+<details>
+<summary><strong>🛠 관리자 기능</strong></summary>
+
+- **관리자 대시보드**
+  - 사용자 수, 로그인 현황, 뉴스 수집 상태 모니터링
+- **회원 관리**
+  - 계정 정지 / 해제
+  - 권한 변경(USER / ADMIN)
+- **토큰 관리**
+  - Refresh Token 강제 만료
+- **로그 관리**
+  - 로그인 로그
+  - 관리자 작업 로그(Admin Log)
+
+</details>
+
+<details>
+<summary><strong>🔍 로그 & 보안</strong></summary>
+
+- 로그인 성공 / 실패 / 잠금 로그 기록  
+- 관리자 모든 행위 로그 기록  
+- IP / User-Agent 기반 접속 정보 저장  
+- 운영·보안 감사 목적 로그 구조 설계  
+
+</details>
+
+---
+
+## 🧭 메뉴 구조도 (PDF)
+
+📄 메뉴 구조도 다운로드  
+👉 [menu structure.pdf](https://github.com/user-attachments/files/24228651/menu.structure.pdf)
+
+---
+
+## 🖥 화면 설계서 (PDF)
+
+📄 화면 설계서 보기  
+👉 [ui-design.pdf](https://github.com/user-attachments/files/24228667/ui-design.pdf)
+
+---
+
+## 🗂 ERD 및 테이블 명세서
+
+📄 ERD  
+<details> <summary><strong>ERD 다이어그램</strong></summary>
+
+<img width="1322" height="988" alt="image" src="https://github.com/user-attachments/assets/e0c61011-41fa-411f-88bb-625aa8cf5cdd" />
+
+</details>
+
+📄 테이블 명세서  
+👉 [table-definition.xls](https://github.com/user-attachments/files/24228696/table-definition.xls)
+
+---
+
 
 ## 📬 프로젝트 구조
 
