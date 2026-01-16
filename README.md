@@ -325,6 +325,87 @@ Redis에 캐싱하여 성능을 최적화했습니다.
 </details>
 
 ---
+## 📸 서비스 화면 예시
+
+<details>
+<summary><strong>📂 서비스 화면 예시 전체 보기</strong></summary>
+
+---
+
+<details>
+<summary><strong>🏠 메인 화면</strong></summary>
+
+<p align="center">
+  <!-- 메인 화면 이미지 삽입 예정 -->
+</p>
+
+</details>
+
+---
+
+<details>
+<summary><strong>📊 감성 대시보드</strong></summary>
+
+<p align="center">
+  <!-- 뉴스 감성 분석 대시보드 이미지 삽입 예정 -->
+</p>
+
+</details>
+
+---
+
+<details>
+<summary><strong>📈 키워드 트렌드</strong></summary>
+
+<p align="center">
+  <!-- 키워드 트렌드 분석 화면 이미지 삽입 예정 -->
+</p>
+
+</details>
+
+---
+
+<details>
+<summary><strong>🏆 시가총액 순위</strong></summary>
+
+<p align="center">
+  <!-- 시가총액 순위 화면 이미지 삽입 예정 -->
+</p>
+
+</details>
+
+---
+
+<details>
+<summary><strong>🔍 종목 검색</strong></summary>
+
+<p align="center">
+  <!-- 종목 검색 결과 화면 이미지 삽입 예정 -->
+</p>
+
+</details>
+
+---
+
+<details>
+<summary><strong>📉 주식 상세 페이지</strong></summary>
+
+<p align="center">
+  <!-- 주식 상세 페이지 (차트 / 뉴스 / 지표) 이미지 삽입 예정 -->
+</p>
+
+</details>
+
+---
+
+<details>
+<summary><strong>👤 마이페이지</strong></summary>
+
+<p align="center">
+  <!-- 마이페이지 화면 이미지 삽입 예정 -->
+</p>
+
+</details>
 🔐 인증 / 보안
 <details> <summary><strong>회원가입</strong></summary>
 
@@ -489,6 +570,9 @@ CSV 파일로 다운로드할 수 있도록 하여,
 운영 이력 확인과 관리 작업 추적이 가능하도록 구현했습니다.
 
 </details>
+</details>
+
+
 
 ## 🧭 메뉴 구조도 (PDF)
 
