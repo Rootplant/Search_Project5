@@ -122,7 +122,7 @@
   - 신규 데이터 발생 시에만 DB에 **증분 삽입**하여 과부하 최소
 
 ---
-## 🔍 담당 기능
+## 🔍 내가 구현한 핵심 기능
 
 🎨 프론트엔드 (React)
 <details>
@@ -186,10 +186,8 @@ React 기반으로 전체 서비스 UI를 구현했습니다.
 <summary><strong>WebSocket 기반 실시간 시세 처리</strong></summary>
 <img width="940" height="687" alt="image" src="https://github.com/user-attachments/assets/b4a5dfbb-683a-48a6-9e1a-77ce0a25a63a" />
 
-<video controls width="800">
-  <source src="https://github.com/user-attachments/assets/fa07d041-1f5a-44ed-ba27-8608fe77f09c" type="video/mp4">
-</video>
-
+https://github.com/user-attachments/assets/e147106e-2a1b-417d-90a4-24f512b4e832
+https://github.com/user-attachments/assets/5ca7d6bf-893e-40db-a9e0-f5c64fed8d29
 
 📌 설명  
 
